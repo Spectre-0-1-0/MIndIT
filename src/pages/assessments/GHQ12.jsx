@@ -3,18 +3,114 @@ import { useNavigate } from 'react-router-dom';
 import { interpretAssessment } from '../../data/scoring';
 
 const questions = [
-  'Been able to concentrate on what you’re doing?',
-  'Lost much sleep over worry?',
-  'Felt that you were playing a useful part in things?',
-  'Felt capable of making decisions about things?',
-  'Felt constantly under strain?',
-  'Felt you couldn’t overcome your difficulties?',
-  'Been able to enjoy your normal day-to-day activities?',
-  'Been able to face up to your problems?',
-  'Been feeling unhappy or depressed?',
-  'Been losing confidence in yourself?',
-  'Been thinking of yourself as a worthless person?',
-  'Been feeling reasonably happy, all things considered?',
+  {
+    text: "Been able to concentrate on what you're doing?",
+    options: [
+      { label: 'Better', value: 0 },
+      { label: 'Same as usual', value: 1 },
+      { label: 'Less than usual', value: 2 },
+      { label: 'Much less than usual', value: 3 },
+    ],
+  },
+  {
+    text: 'Lost much sleep over worry?',
+    options: [
+      { label: 'Not at all', value: 0 },
+      { label: 'No more', value: 1 },
+      { label: 'Rather more', value: 2 },
+      { label: 'Much more', value: 3 },
+    ],
+  },
+  {
+    text: 'Felt you were playing a useful part in things?',
+    options: [
+      { label: 'More so', value: 0 },
+      { label: 'Same', value: 1 },
+      { label: 'Less useful', value: 2 },
+      { label: 'Much less useful', value: 3 },
+    ],
+  },
+  {
+    text: 'Felt capable of making decisions?',
+    options: [
+      { label: 'More so', value: 0 },
+      { label: 'Same', value: 1 },
+      { label: 'Less so', value: 2 },
+      { label: 'Much less capable', value: 3 },
+    ],
+  },
+  {
+    text: 'Felt constantly under strain?',
+    options: [
+      { label: 'Not at all', value: 0 },
+      { label: 'No more', value: 1 },
+      { label: 'Rather more', value: 2 },
+      { label: 'Much more', value: 3 },
+    ],
+  },
+  {
+    text: 'Felt you couldn\'t overcome your difficulties?',
+    options: [
+      { label: 'Not at all', value: 0 },
+      { label: 'No more', value: 1 },
+      { label: 'Rather more', value: 2 },
+      { label: 'Much more', value: 3 },
+    ],
+  },
+  {
+    text: 'Been able to enjoy your normal day-to-day activities?',
+    options: [
+      { label: 'More so', value: 0 },
+      { label: 'Same', value: 1 },
+      { label: 'Less so', value: 2 },
+      { label: 'Much less', value: 3 },
+    ],
+  },
+  {
+    text: 'Been able to face up to your problems?',
+    options: [
+      { label: 'More so', value: 0 },
+      { label: 'Same', value: 1 },
+      { label: 'Less so', value: 2 },
+      { label: 'Much less able', value: 3 },
+    ],
+  },
+  {
+    text: 'Been feeling unhappy and depressed?',
+    options: [
+      { label: 'Not at all', value: 0 },
+      { label: 'No more', value: 1 },
+      { label: 'Rather more', value: 2 },
+      { label: 'Much more', value: 3 },
+    ],
+  },
+  {
+    text: 'Been losing confidence in yourself?',
+    options: [
+      { label: 'Not at all', value: 0 },
+      { label: 'No more', value: 1 },
+      { label: 'Rather more', value: 2 },
+      { label: 'Much more', value: 3 },
+    ],
+  },
+  {
+    text: 'Been thinking of yourself as a worthless person?',
+    options: [
+      { label: 'Not at all', value: 0 },
+      { label: 'No more', value: 1 },
+      { label: 'Rather more', value: 2 },
+      { label: 'Much more', value: 3 },
+    ],
+  },
+  {
+    text: 'Been feeling reasonably happy, all things considered?',
+    options: [
+      { label: 'More so', value: 0 },
+      { label: 'Same', value: 1 },
+      { label: 'Less so', value: 2 },
+      { label: 'Much less', value: 3 },
+    ],
+  },
 ];
 
 export default function GHQ12() {
@@ -76,20 +172,20 @@ export default function GHQ12() {
 
       <form onSubmit={submit} className="space-y-5">
         {questions.map((question, index) => (
-          <div key={question} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-            <p className="font-medium text-slate-900">{index + 1}. {question}</p>
-            <div className="mt-3 flex flex-wrap gap-3">
-              {[0, 1].map((value) => (
-                <label key={value} className="inline-flex items-center gap-2 text-slate-700">
+          <div key={question.text} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+            <p className="font-medium text-slate-900">{index + 1}. {question.text}</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {question.options.map((option) => (
+                <label key={option.value} className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-slate-700 shadow-sm transition hover:border-slate-300">
                   <input
                     type="radio"
                     name={`question-${index}`}
-                    value={value}
-                    checked={answers[index] === value}
-                    onChange={() => handleChange(index, value)}
+                    value={option.value}
+                    checked={answers[index] === option.value}
+                    onChange={() => handleChange(index, option.value)}
                     className="h-4 w-4 rounded border-slate-300 text-slate-900"
                   />
-                  {value === 0 ? 'Not at all' : 'More than usual'}
+                  {option.label}
                 </label>
               ))}
             </div>
@@ -99,11 +195,6 @@ export default function GHQ12() {
           Submit GHQ-12
         </button>
       </form>
-      {score !== null ? (
-        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-slate-700">
-          <strong>Local score:</strong> {score}
-        </div>
-      ) : null}
     </section>
   );
 }

@@ -90,35 +90,24 @@ export function calculateBaiScore(answers) {
 }
 
 export function interpretGHQ12(score) {
-  if (score <= 4) {
+  if (score <= 11) {
     return {
-      title: 'Low Distress',
-      description: 'Your responses indicate minimal current psychological distress.',
+      title: 'Below threshold',
+      description: 'No significant psychiatric morbidity is indicated by your GHQ-12 score.',
       details: [
-        'No significant signs of acute mental strain.',
-        'Continue using self-care and awareness strategies.',
-        'This screen is not a clinical diagnosis.',
-      ],
-    };
-  }
-  if (score <= 8) {
-    return {
-      title: 'Moderate Distress',
-      description: 'Your responses suggest moderate discomfort or strain.',
-      details: [
-        'Consider checking in with a trusted friend or advisor.',
-        'Stress management and rest may help.',
-        'If concerns persist, professional support may be beneficial.',
+        'Your total score is within the expected range for well-being.',
+        'Continue regular self-care and awareness of your mental health.',
+        'This assessment is a screening tool, not a clinical diagnosis.',
       ],
     };
   }
   return {
-    title: 'High Distress',
-    description: 'Your responses suggest a higher level of emotional distress.',
+    title: 'Possible psychiatric morbidity',
+    description: 'Your GHQ-12 score is at or above the threshold for possible psychiatric morbidity.',
     details: [
-      'Consider reaching out for additional support.',
-      'It may help to speak with a counselor or mental health professional.',
-      'This result is for informational purposes only.',
+      'Consider following up with a qualified health professional.',
+      'This result suggests additional assessment may be helpful.',
+      'Use this information as a guide rather than a diagnosis.',
     ],
   };
 }
@@ -169,16 +158,16 @@ export function interpretFlourishing(score) {
 }
 
 export function interpretDigitalStress(scores) {
-  const overallAverage = average(Object.values(scores));
+  const overallAverage = typeof scores === 'number' ? scores : average(Object.values(scores));
   let title = 'Digital Stress';
-  let description = 'Your digital stress profile provides insight into online pressures.';
+  let description = 'Your digital stress score provides insight into how online life is affecting you.';
 
   if (overallAverage <= 2) {
     title = 'Low Digital Stress';
     description = 'You are experiencing relatively low stress from digital life.';
   } else if (overallAverage <= 3.5) {
     title = 'Moderate Digital Stress';
-    description = 'You experience a noticeable level of digital stress in some areas.';
+    description = 'You are noticing some digital stress, and it may help to build healthier boundaries online.';
   } else {
     title = 'High Digital Stress';
     description = 'Digital life may be contributing significantly to your stress.';
@@ -188,11 +177,9 @@ export function interpretDigitalStress(scores) {
     title,
     description,
     details: [
-      `Availability Stress average: ${scores.availabilityStress.toFixed(2)}`,
-      `Approval Anxiety average: ${scores.approvalAnxiety.toFixed(2)}`,
-      `Fear of Missing Out average: ${scores.fearOfMissingOut.toFixed(2)}`,
-      `Connection Overload average: ${scores.connectionOverload.toFixed(2)}`,
-      `Online Vigilance average: ${scores.onlineVigilance.toFixed(2)}`,
+      'Use this result to think about digital habits that support your wellbeing.',
+      'Consider reducing notifications, taking breaks, and setting clear boundaries.',
+      'If digital stress feels persistent, talk with a trusted person or counselor.',
     ],
   };
 }
@@ -362,6 +349,7 @@ export function interpretAssessment(type, value) {
     case 'flourishing':
       return interpretFlourishing(value);
     case 'digitalStress':
+    case 'digital-stress-scale':
       return interpretDigitalStress(value);
     case 'pss10':
       return interpretPSS10(value);

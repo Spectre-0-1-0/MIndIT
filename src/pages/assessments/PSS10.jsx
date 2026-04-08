@@ -198,7 +198,6 @@ export default function PSS10() {
               />
               <div>
                 <p className="font-medium text-slate-800">{option.label}</p>
-                <p className="text-sm text-slate-500">{option.value}</p>
               </div>
             </label>
           ))}

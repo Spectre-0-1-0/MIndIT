@@ -180,11 +180,12 @@ export default function DigitalStressScale() {
 
     navigate('/results', {
       state: {
-        assessmentId: 'digitalStress',
-        title: 'Digital Stress Scale',
-        score: Number(overallAverage.toFixed(2)),
-        interpretation: interpretAssessment('digitalStress', subscaleAverages),
-        subscaleResults: subscaleAverages,
+        result: {
+          assessmentId: 'digital-stress-scale',
+          title: 'Digital Stress Scale',
+          score: Number(overallAverage.toFixed(2)),
+          interpretation: interpretAssessment('digital-stress-scale', overallAverage),
+        },
       },
     });
   };
@@ -194,7 +195,7 @@ export default function DigitalStressScale() {
       <header className="space-y-3">
         <h1 className="text-3xl font-semibold text-slate-900">Digital Stress Scale</h1>
         <p className="text-slate-600">
-          Rate each statement from 1 to 5 based on how often it applies. This assessment calculates average subscale scores for digital stress.
+          Choose the statement that best describes how often each item applies to you. Your overall digital stress level will be interpreted from your responses.
         </p>
       </header>
 
@@ -214,9 +215,6 @@ export default function DigitalStressScale() {
       <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
         <p className="text-base font-semibold text-slate-900">
           {questions[currentQuestion].prompt}
-        </p>
-        <p className="mt-2 text-sm font-medium text-indigo-700">
-          {questions[currentQuestion].category}
         </p>
 
         <div className="mt-6 grid gap-3">
@@ -240,7 +238,6 @@ export default function DigitalStressScale() {
 
               <div>
                 <p className="font-medium text-slate-800">{option.label}</p>
-                <p className="text-sm text-slate-500">{option.value}</p>
               </div>
             </label>
           ))}

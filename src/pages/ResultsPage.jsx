@@ -9,6 +9,7 @@ function getDisplayTitle(result) {
     case 'flourishing-scale':
       return 'Flourishing Scale';
     case 'digital-stress-scale':
+    case 'digitalStress':
       return 'Digital Stress Scale';
     case 'pss10':
       return 'PSS-10';
@@ -55,19 +56,18 @@ function getDefaultInterpretation(result) {
     return { title: 'Severe Anxiety', description: 'Severe anxiety.', details: [] };
   }
   if (assessmentId === 'ghq12') {
-    if (score <= 4) return { title: 'Low Distress', description: 'Low distress.', details: [] };
-    if (score <= 8) return { title: 'Moderate Distress', description: 'Moderate distress.', details: [] };
-    return { title: 'High Distress', description: 'High distress.', details: [] };
+    if (score <= 11) return { title: 'Below threshold', description: 'No significant psychiatric morbidity indicated.', details: [] };
+    return { title: 'Possible psychiatric morbidity', description: 'Further assessment may be recommended.', details: [] };
   }
   if (assessmentId === 'flourishing-scale') {
     if (score >= 42) return { title: 'Flourishing', description: 'Flourishing.', details: [] };
     if (score >= 30) return { title: 'Moderate Well-being', description: 'Moderate well-being.', details: [] };
     return { title: 'Needs Support', description: 'Needs support.', details: [] };
   }
-  if (assessmentId === 'digital-stress-scale') {
-    if (score <= 18) return { title: 'Low Digital Stress', description: 'Low digital stress.', details: [] };
-    if (score <= 34) return { title: 'Moderate Digital Stress', description: 'Moderate digital stress.', details: [] };
-    return { title: 'High Digital Stress', description: 'High digital stress.', details: [] };
+  if (assessmentId === 'digital-stress-scale' || assessmentId === 'digitalStress') {
+    if (score <= 2) return { title: 'Low Digital Stress', description: 'You are experiencing relatively low digital stress.', details: [] };
+    if (score <= 3.5) return { title: 'Moderate Digital Stress', description: 'You are noticing some digital stress, and it may help to build stronger boundaries.', details: [] };
+    return { title: 'High Digital Stress', description: 'Digital life may be contributing significantly to your stress.', details: [] };
   }
   return { title: 'Assessment Complete', description: 'No detailed interpretation available.', details: [] };
 }
@@ -112,9 +112,10 @@ function getDetailText(result) {
         </p>
       );
     case 'digital-stress-scale':
+    case 'digitalStress':
       return (
         <p className="text-slate-700 leading-7">
-          The Digital Stress Scale evaluates how online life affects your stress. Consider adjusting habits and boundaries if your score suggests moderate or high digital strain.
+          The Digital Stress Scale evaluates how online life affects your stress. Consider adjusting habits and boundaries if your result suggests moderate or high digital strain.
         </p>
       );
     default:
@@ -175,12 +176,12 @@ export default function ResultsPage() {
             <section className="rounded-[1.5rem] bg-indigo-50 p-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-700">Score</p>
-                  <p className="mt-2 text-6xl font-bold text-slate-900">{result.score}</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-700">Result summary</p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">{interpretation?.title || 'Assessment Complete'}</p>
                 </div>
                 <div className="rounded-3xl bg-white p-5 shadow-sm">
-                  <p className="text-sm font-semibold text-slate-500">Interpretation</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{interpretation?.title || 'Assessment Complete'}</p>
+                  <p className="text-sm font-semibold text-slate-500">What this means</p>
+                  <p className="mt-2 text-slate-700">{interpretation?.description || 'Your assessment result has been recorded.'}</p>
                 </div>
               </div>
             </section>
