@@ -1,0 +1,104 @@
+.header {
+  background-color: #3730a3;
+  color: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+}
+
+.header-inner {
+  margin: 0 auto;
+  max-width: 1120px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand .logo-container {
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  /* Legacy support - can be removed when fully migrated */
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.brand-text {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.header-link:hover,
+.header-link-active {
+  color: #e0f2fe;
+}
+
+.mobile-toggle {
+  display: none;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.mobile-toggle-bar {
+  display: block;
+  width: 1.5rem;
+  height: 0.15rem;
+  margin: 0.25rem 0;
+  border-radius: 9999px;
+  background-color: white;
+}
+
+@media (max-width: 768px) {
+  .mobile-toggle {
+    display: inline-flex;
+  }
+
+  .nav-menu {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    display: none;
+    margin-top: 0.75rem;
+  }
+
+  .nav-menu.open {
+    display: flex;
+  }
+
+  .header-inner {
+    padding: 1rem;
+  }
+}

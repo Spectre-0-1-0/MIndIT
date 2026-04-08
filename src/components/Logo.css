@@ -1,0 +1,160 @@
+/* Logo Component Styles */
+
+/* Base logo styles */
+.logo-container {
+  transition: all 0.3s ease;
+}
+
+.logo-placeholder {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-placeholder:hover {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  transform: scale(1.05);
+}
+
+/* Variant-specific styles */
+.logo-header {
+  /* Compact for navigation */
+}
+
+.logo-hero {
+  /* Prominent for homepage */
+  filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.3));
+}
+
+.logo-hero .logo-placeholder:hover {
+  filter: drop-shadow(0 6px 16px rgba(99, 102, 241, 0.4));
+  transform: scale(1.08);
+}
+
+.logo-footer {
+  /* Subtle for footer */
+  opacity: 0.8;
+}
+
+.logo-footer .logo-placeholder:hover {
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+.logo-results {
+  /* Professional for results page */
+  margin-bottom: 1rem;
+}
+
+.logo-contact {
+  /* Trust-building for contact page */
+  margin-bottom: 1.5rem;
+}
+
+.logo-udaan {
+  /* Program-specific branding */
+  filter: drop-shadow(0 3px 8px rgba(99, 102, 241, 0.25));
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .logo-hero {
+    /* Smaller on mobile */
+  }
+
+  .logo-hero .logo-placeholder {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .logo-header .logo-placeholder {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .logo-footer .logo-placeholder {
+    width: 48px !important;
+    height: 48px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-hero .logo-placeholder {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .logo-header .logo-placeholder {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .logo-footer .logo-placeholder {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .logo-placeholder {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  }
+
+  .logo-placeholder:hover {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .logo-placeholder {
+    filter: none;
+    border: 2px solid currentColor;
+    border-radius: 8px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .logo-container,
+  .logo-placeholder {
+    transition: none;
+  }
+
+  .logo-placeholder:hover {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .logo-container {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  .logo-placeholder {
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.logo-container:focus-within {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --mc-primary-50: #eef2ff;
+    --mc-primary-100: #e0e7ff;
+    --mc-primary-500: #6366f1;
+    --mc-primary-600: #4f46e5;
+    --mc-primary-700: #4338ca;
+    --mc-primary-800: #3730a3;
+    --mc-secondary-purple: #a855f7;
+    --mc-secondary-blue: #3b82f6;
+    --mc-surface: #ffffff;
+    --mc-muted: #64748b;
+    --mc-warning: #fef08a;
+    --mc-critical: #ef4444;
+    --mc-backdrop: rgba(255, 255, 255, 0.68);
+    --mc-glass-border: rgba(255, 255, 255, 0.72);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    text-rendering: optimizeLegibility;
+    background-color: var(--mc-primary-50);
+    color: #111827;
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--mc-surface);
+    color: #0f172a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  ::selection {
+    background-color: rgba(99, 102, 241, 0.16);
+    color: #111827;
+  }
+
+  *:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.18);
+  }
+}
+
+@layer components {
+  .mc-card {
+    @apply rounded-[2rem] bg-white shadow-card transition duration-250 ease-soft transform will-change-transform;
+  }
+
+  .mc-card:hover {
+    @apply -translate-y-0.5 shadow-cardHover;
+  }
+
+  .mc-card-glass {
+    @apply rounded-[2rem] border border-white/60 bg-white/70 backdrop-blur-sm shadow-glow;
+    border-color: var(--mc-glass-border);
+  }
+
+  .mc-button {
+    @apply relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-brand-500 via-brand-600 to-brand-700 px-6 py-3 text-sm font-semibold text-white shadow-md outline-none transition duration-150 ease-in-out transform;
+    overflow: hidden;
+  }
+
+  .mc-button:hover {
+    @apply scale-[1.01];
+  }
+
+  .mc-button:active {
+    transform: scale(0.98);
+  }
+
+  .mc-button::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, transparent 60%);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .mc-button:hover::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .mc-input {
+    @apply w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition duration-150 ease-soft focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
+
+  .mc-input:focus {
+    @apply bg-white;
+  }
+
+  .mc-input-group {
+    position: relative;
+    display: block;
+  }
+
+  .mc-input-group label {
+    @apply pointer-events-none absolute left-4 top-4 origin-left text-xs font-medium text-slate-500 transition-all duration-200 ease-soft;
+  }
+
+  .mc-input-group input:focus + label,
+  .mc-input-group textarea:focus + label,
+  .mc-input-group input:not(:placeholder-shown) + label,
+  .mc-input-group textarea:not(:placeholder-shown) + label {
+    transform: translateY(-1.75rem) scale(0.92);
+    color: #4f46e5;
+  }
+
+  .mc-progress {
+    @apply h-3 rounded-full bg-slate-200 overflow-hidden;
+  }
+
+  .mc-progress__bar {
+    @apply h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700 transition-all duration-500 ease-entrance;
+  }
+
+  .mc-progress__label {
+    @apply mt-2 text-sm font-medium text-slate-700;
+  }
+
+  .mc-badge {
+    @apply inline-flex items-center rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-700;
+  }
+
+  .mc-badge-glow {
+    @apply inline-flex items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 shadow-glow;
+  }
+
+  .mc-modal-backdrop {
+    @apply fixed inset-0 bg-slate-950/20 backdrop-blur-sm;
+  }
+
+  .mc-modal-panel {
+    @apply relative mx-auto mt-24 w-full max-w-3xl rounded-[2rem] bg-white p-8 shadow-card hover:shadow-cardHover;
+  }
+
+  .mc-skeleton {
+    @apply animate-pulse rounded-3xl bg-slate-200/70;
+  }
+
+  .mc-skeleton-wave {
+    @apply bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 bg-[length:200%_100%] animate-skeleton-wave;
+  }
+
+  .mc-glass-panel {
+    @apply rounded-[2rem] border border-white/70 bg-white/70 p-6 shadow-glow backdrop-blur-md;
+  }
+
+  .mc-responsive-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .mc-responsive-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .mc-responsive-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+}
+
+@layer utilities {
+  .mc-hero-background {
+    background-image: radial-gradient(circle at top left, rgba(79, 70, 229, 0.14), transparent 35%), radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.12), transparent 40%);
+  }
+
+  .mc-focus-ring {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+  }
+
+  .mc-slide-in-left {
+    animation: slide-in-left 0.8s ease-entrance both;
+  }
+
+  .mc-slide-in-right {
+    animation: slide-in-right 0.8s ease-entrance both;
+  }
+
+  .mc-loading-spinner {
+    @apply inline-block h-8 w-8 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin-slow;
+  }
+
+  .mc-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mc-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.32) 0%, transparent 55%);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .mc-ripple:active::after {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .mc-scroll-shadow {
+    box-shadow: inset 0 14px 20px -18px rgba(15, 23, 42, 0.18);
+  }
+
+  .mc-hero-parallax {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+}
+
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes skeleton-wave {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+.animation-delay-600 { animation-delay: 0.6s; }
+.animation-delay-1000 { animation-delay: 1s; }
+.animation-delay-1200 { animation-delay: 1.2s; }
+
+@keyframes slide-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
