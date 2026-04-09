@@ -299,25 +299,25 @@ export default function UdaanPage() {
 
 
         {/* Contact Info Module */}
-        <section className="rounded-[2rem] bg-white p-8 shadow-xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-slate-900 mb-4">Get Involved</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+        <section className="rounded-[2rem] bg-white p-4 md:p-8 shadow-xl">
+          <div className="text-center mb-6 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2 md:mb-4">Get Involved</h2>
+            <p className="text-sm md:text-lg text-slate-600 max-w-2xl mx-auto">
               Join the UDAAN community and be part of the movement for student mental wellness
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div className="space-y-6">
-              <div className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+            <div className="space-y-4 md:space-y-6">
+              <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 rounded-xl md:rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                <div className="flex h-10 md:h-12 w-10 md:w-12 items-center justify-center rounded-xl bg-indigo-100 text-lg md:text-2xl">
                   📧
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900 mb-1">Email Us</h3>
                   <a
                     href={CONTACT_INFO.email.href}
-                    className="text-slate-600 hover:text-indigo-600 hover:underline transition-colors duration-200 cursor-pointer"
+                    className="text-sm md:text-base text-slate-600 hover:text-indigo-600 hover:underline transition-colors duration-200 cursor-pointer"
                     aria-label={CONTACT_INFO.email.ariaLabel}
                   >
                     {CONTACT_INFO.email.display}
@@ -325,15 +325,15 @@ export default function UdaanPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 text-2xl">
+              <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 rounded-xl md:rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                <div className="flex h-10 md:h-12 w-10 md:w-12 items-center justify-center rounded-xl bg-green-100 text-lg md:text-2xl">
                   📞
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900 mb-1">Call Us</h3>
                   <a
                     href={CONTACT_INFO.phone.href}
-                    className="text-slate-600 hover:text-indigo-600 hover:underline transition-colors duration-200 cursor-pointer"
+                    className="text-sm md:text-base text-slate-600 hover:text-indigo-600 hover:underline transition-colors duration-200 cursor-pointer"
                     aria-label={CONTACT_INFO.phone.ariaLabel}
                   >
                     {CONTACT_INFO.phone.display}
@@ -341,8 +341,8 @@ export default function UdaanPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 text-2xl">
+              <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 rounded-xl md:rounded-2xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                <div className="flex h-10 md:h-12 w-10 md:w-12 items-center justify-center rounded-xl bg-purple-100 text-lg md:text-2xl">
                   📱
                 </div>
                 <div>
@@ -351,7 +351,7 @@ export default function UdaanPage() {
                     href={CONTACT_INFO.instagram.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-slate-600 hover:text-indigo-600 hover:underline transition-colors duration-200 cursor-pointer"
+                    className="text-sm md:text-base text-slate-600 hover:text-indigo-600 hover:underline transition-colors duration-200 cursor-pointer"
                     aria-label={CONTACT_INFO.instagram.ariaLabel}
                   >
                     {CONTACT_INFO.instagram.display}
@@ -360,18 +360,18 @@ export default function UdaanPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8">
-              <h3 className="text-xl font-semibold text-slate-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl md:rounded-2xl p-4 md:p-8">
+              <h3 className="text-lg md:text-xl font-semibold text-slate-900 mb-3 md:mb-4">Quick Actions</h3>
+              <div className="flex flex-col md:space-y-3 gap-3">
                 <Link
                   to="/"
-                  className="block w-full text-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+                  className="block w-full text-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors min-h-[48px]"
                 >
                   Take an Assessment
                 </Link>
                 <Link
                   to="/contact"
-                  className="block w-full text-center px-6 py-3 border-2 border-indigo-600 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors"
+                  className="block w-full text-center px-6 py-3 border-2 border-indigo-600 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-50 transition-colors min-h-[48px]"
                 >
                   Contact Support
                 </Link>

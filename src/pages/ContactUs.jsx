@@ -42,14 +42,14 @@ export default function ContactUs() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-gradient-to-br from-indigo-400/10 to-purple-400/10 blur-3xl animate-float-particle"></div>
-        <div className="absolute top-1/2 -left-40 h-64 w-64 rounded-full bg-gradient-to-br from-violet-400/10 to-pink-400/10 blur-3xl animate-float-particle animation-delay-200"></div>
+        <div className="absolute -top-40 -right-40 h-64 md:h-80 w-64 md:w-80 rounded-full bg-gradient-to-br from-indigo-400/10 to-purple-400/10 blur-3xl animate-float-particle"></div>
+        <div className="absolute top-1/2 -left-40 h-48 md:h-64 w-48 md:w-64 rounded-full bg-gradient-to-br from-violet-400/10 to-pink-400/10 blur-3xl animate-float-particle animation-delay-200"></div>
       </div>
 
-      <div className="relative space-y-10 rounded-[2rem] bg-gradient-to-br from-indigo-50 via-violet-50 to-white p-6 shadow-xl sm:p-10">
-        <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-700 via-violet-700 to-fuchsia-700 p-8 text-white shadow-2xl">
+      <div className="relative space-y-6 md:space-y-10 rounded-[2rem] bg-gradient-to-br from-indigo-50 via-violet-50 to-white px-4 md:p-6 shadow-xl sm:p-10">
+        <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-indigo-700 via-violet-700 to-fuchsia-700 p-6 md:p-8 text-white shadow-2xl">
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.35),_transparent_35%)]"></div>
-          <div className="relative z-10 text-center space-y-6">
+          <div className="relative z-10 text-center space-y-4 md:space-y-6">
             <div className="flex justify-center">
               <Logo
                 variant="contact"
@@ -57,40 +57,40 @@ export default function ContactUs() {
                 title="MCheck - A UDAAN Initiative Contact Support"
               />
             </div>
-            <div className="space-y-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-sky-200">MCheck - A UDAAN Initiative</p>
-              <h1 className="text-4xl font-semibold text-white sm:text-5xl">Contact the UDAAN Wellness Team</h1>
-              <p className="mx-auto max-w-2xl text-base text-slate-200 sm:text-lg">
+            <div className="space-y-2 md:space-y-3">
+              <p className="text-xs md:text-sm font-semibold uppercase tracking-[0.28em] text-sky-200">MCheck - A UDAAN Initiative</p>
+              <h1 className="text-3xl md:text-4xl font-semibold text-white sm:text-5xl">Contact the UDAAN Wellness Team</h1>
+              <p className="mx-auto max-w-2xl text-sm md:text-base text-slate-200 sm:text-lg">
                 Connect with UDAAN for support, feedback, and wellbeing resources. Use the Google Form to share your needs directly.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <h2 className="text-2xl font-semibold text-slate-900">UDAAN Wellness Team</h2>
-          <p className="text-slate-700">Speak directly with the UDAAN team for wellness guidance, counseling support, and campus resources.</p>
+        <section className="space-y-4 md:space-y-6 rounded-[2rem] border border-slate-200 bg-white p-4 md:p-8 shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <h2 className="text-xl md:text-2xl font-semibold text-slate-900">UDAAN Wellness Team</h2>
+          <p className="text-sm md:text-base text-slate-700">Speak directly with the UDAAN team for wellness guidance, counseling support, and campus resources.</p>
 
-          <div className="space-y-5">
-            <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
+          <div className="space-y-3 md:space-y-5">
+            <div className="rounded-[1.5rem] md:rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 md:p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
               <p className="text-xs uppercase tracking-[0.24em] text-indigo-600">Team Lead</p>
-              <p className="mt-2 text-lg font-semibold text-slate-900">Meghana Musku</p>
+              <p className="mt-1 md:mt-2 text-base md:text-lg font-semibold text-slate-900">Meghana Musku</p>
               <p className="text-sm text-slate-600">Senior Executive - Wellness</p>
             </div>
-            <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
+            <div className="rounded-[1.5rem] md:rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 md:p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
               <p className="text-xs uppercase tracking-[0.24em] text-indigo-600">Team Lead</p>
-              <p className="mt-2 text-lg font-semibold text-slate-900">Pranav Amarnath</p>
+              <p className="mt-1 md:mt-2 text-base md:text-lg font-semibold text-slate-900">Pranav Amarnath</p>
               <p className="text-sm text-slate-600">Senior Executive - Wellness</p>
             </div>
 
-            <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
+            <div className="rounded-[1.5rem] md:rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 md:p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
               <div className="flex items-center gap-3 text-slate-900">
-                <span className="text-xl">📞</span>
+                <span className="text-lg md:text-xl">📞</span>
                 <div>
-                  <p className="text-sm font-semibold">Wellness Helpline</p>
+                  <p className="text-xs md:text-sm font-semibold">Wellness Helpline</p>
                   <a
                     href={CONTACT_INFO.phone.href}
-                    className="text-lg font-semibold hover:text-indigo-600 hover:underline transition-colors duration-200"
+                    className="text-base md:text-lg font-semibold hover:text-indigo-600 hover:underline transition-colors duration-200"
                     aria-label={CONTACT_INFO.phone.ariaLabel}
                   >
                     {CONTACT_INFO.phone.display}
@@ -99,14 +99,14 @@ export default function ContactUs() {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
+            <div className="rounded-[1.5rem] md:rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 md:p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
               <div className="flex items-center gap-3 text-slate-900">
-                <span className="text-xl">📧</span>
+                <span className="text-lg md:text-xl">📧</span>
                 <div>
-                  <p className="text-sm font-semibold">Email</p>
+                  <p className="text-xs md:text-sm font-semibold">Email</p>
                   <a
                     href={CONTACT_INFO.email.href}
-                    className="text-lg font-semibold hover:text-indigo-600 hover:underline transition-colors duration-200"
+                    className="text-base md:text-lg font-semibold hover:text-indigo-600 hover:underline transition-colors duration-200"
                     aria-label={CONTACT_INFO.email.ariaLabel}
                   >
                     {CONTACT_INFO.email.display}
@@ -115,37 +115,37 @@ export default function ContactUs() {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
+            <div className="rounded-[1.5rem] md:rounded-[1.75rem] border border-slate-200 bg-slate-50 p-4 md:p-5 shadow-sm transition-all duration-300 hover:border-indigo-300 hover:shadow-md">
               <div className="flex items-center gap-3 text-slate-900">
-                <span className="text-xl">📍</span>
+                <span className="text-lg md:text-xl">📍</span>
                 <div>
-                  <p className="text-sm font-semibold">Address</p>
-                  <p className="text-lg font-semibold">GITAM (Deemed to be) University, Bengaluru</p>
+                  <p className="text-xs md:text-sm font-semibold">Address</p>
+                  <p className="text-base md:text-lg font-semibold">GITAM (Deemed to be) University, Bengaluru</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="rounded-[2rem] bg-gradient-to-br from-indigo-50 to-purple-50 p-8 shadow-xl transition-all duration-300 hover:-translate-y-1">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <section className="rounded-[2rem] bg-gradient-to-br from-indigo-50 to-purple-50 p-4 md:p-8 shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-3 md:mb-4 flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 md:w-6 h-5 md:h-6 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             {CONTACT_INFO.googleForm.title}
           </h2>
-          <p className="text-slate-600 mb-6">{CONTACT_INFO.googleForm.description}</p>
+          <p className="text-sm md:text-base text-slate-600 mb-4 md:mb-6">{CONTACT_INFO.googleForm.description}</p>
           <a
             href={CONTACT_INFO.googleForm.href}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => window.scrollTo(0, 0)}
-            className="inline-flex items-center gap-3 rounded-full bg-indigo-700 px-8 py-4 text-white shadow-lg transition-all duration-300 hover:bg-indigo-600 hover:shadow-2xl hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center gap-3 rounded-full bg-indigo-700 px-6 md:px-8 py-3 md:py-4 text-sm md:text-base text-white shadow-lg transition-all duration-300 hover:bg-indigo-600 hover:shadow-2xl hover:-translate-y-0.5 w-full md:w-auto"
           >
             {CONTACT_INFO.googleForm.buttonText}
-            <span className="text-xl">↗</span>
+            <span className="text-lg md:text-xl">↗</span>
           </a>
-          <div className="mt-4 rounded-3xl bg-white p-4 text-sm text-slate-700 border border-slate-200">
+          <div className="mt-4 rounded-2xl md:rounded-3xl bg-white p-3 md:p-4 text-sm text-slate-700 border border-slate-200">
             <strong>Privacy Notice:</strong> Google Forms handles submission data directly. We do not retain any responses submitted through this external form.
           </div>
         </section>
