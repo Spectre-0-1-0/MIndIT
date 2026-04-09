@@ -12,13 +12,13 @@ export default function Header() {
   return (
     <header className="header">
       <div className="header-inner">
-        <Link to="/" className="brand" onClick={() => setMenuOpen(false)}>
+        <Link to="/" className="brand" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}>
           <Logo
             variant="header"
-            alt="MindCheck - Mental Health Assessment Platform"
+            alt="MCheck - A UDAAN Initiative - Mental Health Assessment Platform"
             title="Go to homepage"
           />
-          <span className="brand-text">MindCheck</span>
+          <span className="brand-text">MCheck</span>
         </Link>
 
         <button
@@ -34,13 +34,13 @@ export default function Header() {
         </button>
 
         <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
-          <NavLink to="/" end className={navClass} onClick={() => setMenuOpen(false)}>
+          <NavLink to="/" end className={navClass} onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}>
             Home
           </NavLink>
-          <NavLink to="/udaan" className={navClass} onClick={() => setMenuOpen(false)}>
+          <NavLink to="/udaan" className={navClass} onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}>
             UDAAN
           </NavLink>
-          <NavLink to="/contact" className={navClass} onClick={() => setMenuOpen(false)}>
+          <NavLink to="/contact" className={navClass} onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}>
             Contact
           </NavLink>
         </nav>

@@ -8,15 +8,15 @@ export default function Footer() {
         <div className="footer-branding">
           <Logo
             variant="footer"
-            alt="MindCheck Organization"
-            title="MindCheck - Mental Health Assessment Platform"
+            alt="MCheck - A UDAAN Initiative"
+            title="MCheck - A UDAAN Initiative - Mental Health Assessment Platform"
           />
           <div className="footer-content">
-            <p className="footer-text footer-strong">MindCheck — Student mental health awareness and guidance.</p>
+            <p className="footer-text footer-strong">MCheck — Student mental health awareness and guidance, powered by UDAAN.</p>
             <p className="footer-text">Assessments are designed for self-awareness only and are not medical advice.</p>
           </div>
         </div>
-        <p className="footer-text footer-copyright">© {new Date().getFullYear()} MindCheck. All rights reserved.</p>
+        <p className="footer-text footer-copyright">© {new Date().getFullYear()} MCheck - A UDAAN Initiative. All rights reserved.</p>
       </div>
     </footer>
   );

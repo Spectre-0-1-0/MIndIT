@@ -77,6 +77,10 @@ export default function Home() {
   const [visibleCards, setVisibleCards] = useState([]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -110,8 +114,8 @@ export default function Home() {
           <div className="flex justify-center">
             <Logo
               variant="hero"
-              alt="MindCheck - Mental Health Assessment Platform"
-              title="Welcome to MindCheck"
+              alt="MCheck - A UDAAN Initiative Mental Health Assessment Platform"
+              title="Welcome to MCheck"
               className="animate-fade-in"
             />
           </div>
@@ -184,7 +188,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl space-y-8">
           <div className="text-center space-y-4">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-600">
-              About MindCheck
+              About MCheck
             </p>
             <h2 className="text-4xl font-semibold text-slate-900 sm:text-5xl">
               Built for privacy, clarity, and
@@ -197,7 +201,7 @@ export default function Home() {
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div className="space-y-6 text-lg leading-8 text-slate-700">
               <p>
-                MindCheck is a privacy-first platform that helps students reflect on their mental health. All assessments are self-guided and designed to support awareness without requiring authentication or data storage.
+                MCheck is a privacy-first platform that helps students reflect on their mental health. All assessments are self-guided and designed to support awareness without requiring authentication or data storage.
               </p>
               <p>
                 Your responses stay in your browser session only. We do not save, share, or track your answers, so you can explore your emotional wellness with confidence and calm.

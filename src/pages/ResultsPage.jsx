@@ -1,5 +1,27 @@
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
+
+const UDAAN_EMAIL = 'UDAAN_DOSL_BLR@GITAM.EDU';
+
+function constructUdaanMailto(result, assessmentTitle, interpretation) {
+  const userName = result?.userName || result?.name || 'Anonymous User';
+  const score = result?.score ?? 'N/A';
+  
+  const bodyTemplate = `You dont have to edit anything udaan team will reach out to you. Just hit Send
+
+Hello,
+
+This is "${userName}", i had a score of "${score}", on the assessment "${assessmentTitle}"
+
+I am looking for counselling sessions.`;
+  
+  const subject = 'Hello UDAAN';
+  
+  const mailtoUrl = `mailto:${UDAAN_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyTemplate)}`;
+  
+  return mailtoUrl;
+}
 
 function getDisplayTitle(result) {
   if (result.title) return result.title;
@@ -76,55 +98,61 @@ function getDetailText(result) {
   const { assessmentId, score } = result;
   switch (assessmentId) {
     case 'pss10':
-      return (
-        <p className="text-slate-700 leading-7">
-          Your PSS-10 score reflects how much stress you have perceived in the last month. Use this score to identify moments when self-care, rest, or support may help you feel more in control.
-        </p>
-      );
+      return 'Your PSS-10 score reflects how much stress you have perceived in the last month. Use this score to identify moments when self-care, rest, or support may help you feel more in control.';
     case 'rses':
-      return (
-        <p className="text-slate-700 leading-7">
-          The Rosenberg Self-Esteem Scale measures your overall self-regard. Higher scores suggest greater confidence and self-worth, while lower scores indicate areas where compassion and self-support may help.
-        </p>
-      );
+      return 'The Rosenberg Self-Esteem Scale measures your overall self-regard. Higher scores suggest greater confidence and self-worth, while lower scores indicate areas where compassion and self-support may help.';
     case 'bdi2':
-      return (
-        <p className="text-slate-700 leading-7">
-          The BDI-II is a screening tool for depressive symptoms. A higher score may indicate the need for further professional assessment and support, especially if symptoms interfere with daily life.
-        </p>
-      );
+      return 'The BDI-II is a screening tool for depressive symptoms. A higher score may indicate the need for further professional assessment and support, especially if symptoms interfere with daily life.';
     case 'bai':
-      return (
-        <p className="text-slate-700 leading-7">
-          The Beck Anxiety Inventory tracks common anxiety symptoms. A higher score suggests more significant anxiety, and it may be helpful to explore calming strategies or professional guidance.
-        </p>
-      );
+      return 'The Beck Anxiety Inventory tracks common anxiety symptoms. A higher score suggests more significant anxiety, and it may be helpful to explore calming strategies or professional guidance.';
     case 'ghq12':
-      return (
-        <p className="text-slate-700 leading-7">
-          GHQ-12 is a screening measure of current mental distress. It is useful for spotting how you are feeling now, but it is not a substitute for a clinical evaluation.
-        </p>
-      );
+      return 'GHQ-12 is a screening measure of current mental distress. It is useful for spotting how you are feeling now, but it is not a substitute for a clinical evaluation.';
     case 'flourishing-scale':
-      return (
-        <p className="text-slate-700 leading-7">
-          The Flourishing Scale measures your sense of purpose, relationships, and psychological well-being. Use this insight to celebrate strengths and identify areas to nurture.
-        </p>
-      );
+      return 'The Flourishing Scale measures your sense of purpose, relationships, and psychological well-being. Use this insight to celebrate strengths and identify areas to nurture.';
     case 'digital-stress-scale':
     case 'digitalStress':
-      return (
-        <p className="text-slate-700 leading-7">
-          The Digital Stress Scale evaluates how online life affects your stress. Consider adjusting habits and boundaries if your result suggests moderate or high digital strain.
-        </p>
-      );
+      return 'The Digital Stress Scale evaluates how online life affects your stress. Consider adjusting habits and boundaries if your result suggests moderate or high digital strain.';
     default:
-      return (
-        <p className="text-slate-700 leading-7">
-          This result is provided for informational purposes only. Use it to reflect on your mental wellness and consider supportive next steps.
-        </p>
-      );
+      return 'This result is provided for informational purposes only. Use it to reflect on your mental wellness and consider supportive next steps.';
   }
+}
+
+function generateEmailContent(result, assessmentTitle, interpretation) {
+  const subject = `Your MindCheck Assessment Results - ${assessmentTitle}`;
+
+  const body = `
+Your MindCheck Assessment Results
+================================
+
+Assessment: ${assessmentTitle}
+
+Your Results: ${interpretation?.title || 'Assessment Complete'}
+${interpretation?.description || 'Your assessment has been completed.'}
+
+${interpretation?.details && interpretation.details.length > 0 ?
+  `Key Points:
+${interpretation.details.map(point => `• ${point}`).join('\n')}
+
+` : ''}About This Assessment:
+${getDetailText(result)}
+
+Support Resources:
+• Student Helpline: Call 1800-123-456 for confidential student support
+• Mental Health Support: Text SUPPORT to 80000 or visit your campus counselor
+• Emergency Services: If you are in immediate danger, call 911 or your local emergency number
+• Trusted Friend: Share this result with someone you trust and ask for support if you feel overwhelmed
+
+Important Disclaimer:
+This assessment is not a diagnosis. It is a screening tool designed to help you reflect on your current state. If you have concerns about your mental health, please seek professional support.
+
+Privacy Statement:
+Your assessment data was processed entirely in your browser and was not stored on our servers. This email was generated client-side for your convenience.
+
+---
+MindCheck - Supporting Student Mental Wellness
+`.trim();
+
+  return { subject, body };
 }
 
 export default function ResultsPage() {
@@ -133,6 +161,12 @@ export default function ResultsPage() {
   const result = location.state?.result;
   const assessmentTitle = result ? getDisplayTitle(result) : 'Assessment Results';
   const interpretation = result ? getDefaultInterpretation(result) : null;
+  const emailContent = result ? generateEmailContent(result, assessmentTitle, interpretation) : null;
+  const [udaanError, setUdaanError] = useState(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handlePrint = () => {
     window.print();
@@ -140,6 +174,15 @@ export default function ResultsPage() {
 
   const handleRetake = () => {
     navigate('/');
+  };
+
+  const handleSendToUdaan = () => {
+    try {
+      const mailtoUrl = constructUdaanMailto(result, assessmentTitle, interpretation);
+      window.location.href = mailtoUrl;
+    } catch (err) {
+      setUdaanError('Unable to open email client. Please try again or email UDAAN_DOSL_BLR@GITAM.EDU directly.');
+    }
   };
 
   return (
@@ -205,7 +248,9 @@ export default function ResultsPage() {
 
             <section className="rounded-[1.5rem] bg-white p-8 shadow-sm">
               <h2 className="text-2xl font-semibold text-slate-900">About this assessment</h2>
-              <div className="mt-4 space-y-4">{getDetailText(result)}</div>
+              <div className="mt-4 space-y-4">
+                <p className="text-slate-700 leading-7">{getDetailText(result)}</p>
+              </div>
             </section>
 
             <section className="rounded-[1.5rem] bg-white p-8 shadow-sm">
@@ -213,6 +258,11 @@ export default function ResultsPage() {
               <p className="mt-4 text-slate-700 leading-7">
                 This assessment is not a diagnosis. It is a screening tool designed to help you reflect on your current state. If you have concerns about your mental health, please seek professional support.
               </p>
+              <div className="mt-4 rounded-3xl bg-blue-50 p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Privacy & Data Protection:</strong> Your assessment responses and results are processed entirely in your browser and are never stored on our servers. We prioritize your privacy and do not collect, store, or share any personal assessment data.
+                </p>
+              </div>
               {result.assessmentId === 'bdi2' && result.score > 28 ? (
                 <div className="mt-4 rounded-3xl border border-rose-200 bg-rose-50 p-4 text-rose-900">
                   <p className="font-semibold">Urgent note:</p>
@@ -223,25 +273,49 @@ export default function ResultsPage() {
               ) : null}
             </section>
 
+            <section className="rounded-[1.5rem] bg-indigo-50 p-8">
+              <h2 className="text-2xl font-semibold text-slate-900">Send Results to UDAAN</h2>
+              <p className="mt-2 text-slate-600">
+                Send your results to UDAAN team. No editing required - just press Send
+              </p>
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={handleSendToUdaan}
+                  className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  Send Results to UDAAN
+                </button>
+              </div>
+              <p className="mt-4 text-sm text-slate-500">
+                This will open your email client with your assessment results pre-filled. The UDAAN team will reach out to you.
+              </p>
+              {udaanError && (
+                <p className="mt-4 text-sm text-rose-600">
+                  {udaanError}
+                </p>
+              )}
+            </section>
+
             <section className="rounded-[1.5rem] bg-white p-8 shadow-sm">
-              <h2 className="text-2xl font-semibold text-slate-900">Support resources</h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <p className="font-semibold text-slate-900">Student helpline</p>
-                  <p className="mt-2 text-slate-600">Call <span className="font-semibold">1800-123-456</span> for confidential student support.</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <p className="font-semibold text-slate-900">Mental health support</p>
-                  <p className="mt-2 text-slate-600">Text <span className="font-semibold">SUPPORT</span> to <span className="font-semibold">80000</span> or visit your campus counselor.</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <p className="font-semibold text-slate-900">Emergency services</p>
-                  <p className="mt-2 text-slate-600">If you are in immediate danger, call <span className="font-semibold">911</span> or your local emergency number.</p>
-                </div>
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <p className="font-semibold text-slate-900">Trusted friend</p>
-                  <p className="mt-2 text-slate-600">Share this result with someone you trust and ask for support if you feel overwhelmed.</p>
-                </div>
+              <h2 className="text-2xl font-semibold text-slate-900">Reach Out to Us</h2>
+              <p className="mt-2 text-slate-600">
+                Have questions about your results or need support? This optional form allows you to contact us directly. Your responses are handled by Google Forms and are not stored on our servers.
+              </p>
+              <div className="mt-6">
+                <a
+                  href="https://docs.google.com/forms/d/e/1FAIpQLScrycIDO1HT5ouCYTMjFt-1kFbKgj9o5GCItyFTejJrmYohHw/viewform"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                >
+                  Open Contact Form
+                </a>
+              </div>
+              <div className="mt-4 rounded-3xl bg-amber-50 p-4">
+                <p className="text-sm text-amber-800">
+                  <strong>Privacy Notice:</strong> This form is powered by Google Forms. Google has its own privacy policy regarding data collection and processing. We do not receive or store any information submitted through this form. Your assessment data remains private and is not shared.
+                </p>
               </div>
             </section>
 
