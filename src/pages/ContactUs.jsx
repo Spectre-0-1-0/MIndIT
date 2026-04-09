@@ -16,6 +16,12 @@ const CONTACT_INFO = {
     display: 'udaan.gitam',
     href: 'https://www.instagram.com/udaan.gitam?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==',
     ariaLabel: 'Visit UDAAN Instagram profile'
+  },
+  googleForm: {
+    href: 'https://docs.google.com/forms/d/e/1FAIpQLScrycIDO1HT5ouCYTMjFt-1kFbKgj9o5GCItyFTejJrmYohHw/viewform',
+    title: 'Connect With Us',
+    description: 'Reach out to us for support, queries, or to connect with the UDAAN team.',
+    buttonText: 'Connect Now'
   }
 };
 
@@ -123,18 +129,20 @@ export default function ContactUs() {
 
         <section className="rounded-[2rem] bg-gradient-to-br from-indigo-50 to-purple-50 p-8 shadow-xl transition-all duration-300 hover:-translate-y-1">
           <h2 className="text-2xl font-semibold text-slate-900 mb-4 flex items-center gap-3">
-            <span>📝</span>
-            Google Form Feedback
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            {CONTACT_INFO.googleForm.title}
           </h2>
-          <p className="text-slate-600 mb-6">Share longer feedback through our external Google Form. We do not store responses on our servers.</p>
+          <p className="text-slate-600 mb-6">{CONTACT_INFO.googleForm.description}</p>
           <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLScrycIDO1HT5ouCYTMjFt-1kFbKgj9o5GCItyFTejJrmYohHw/viewform"
+            href={CONTACT_INFO.googleForm.href}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => window.scrollTo(0, 0)}
             className="inline-flex items-center gap-3 rounded-full bg-indigo-700 px-8 py-4 text-white shadow-lg transition-all duration-300 hover:bg-indigo-600 hover:shadow-2xl hover:-translate-y-0.5"
           >
-            Connect
+            {CONTACT_INFO.googleForm.buttonText}
             <span className="text-xl">↗</span>
           </a>
           <div className="mt-4 rounded-3xl bg-white p-4 text-sm text-slate-700 border border-slate-200">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import AssessmentCard from '../components/AssessmentCard';
 import Logo from '../components/Logo';
 
@@ -95,7 +96,6 @@ export default function Home() {
     const cards = document.querySelectorAll('.assessment-card');
     cards.forEach((card) => observer.observe(card));
 
-    // Stagger animation for cards
     const timer = setTimeout(() => {
       setVisibleCards(Array.from({ length: assessments.length }, (_, i) => i));
     }, 500);
@@ -105,6 +105,13 @@ export default function Home() {
       observer.disconnect();
     };
   }, []);
+
+  const handleStartAssessment = () => {
+    const element = document.getElementById('assessment');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   return (
     <div className="space-y-16">
@@ -134,12 +141,18 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center animate-slide-up animation-delay-600">
-            <button className="mc-button mc-ripple">
+            <button 
+              onClick={handleStartAssessment}
+              className="mc-button mc-ripple"
+            >
               Start Your Assessment
             </button>
-            <button className="inline-flex items-center justify-center rounded-full border-2 border-indigo-200 bg-white px-6 py-3 text-sm font-semibold text-indigo-700 transition duration-150 ease-soft hover:bg-indigo-50 hover:border-indigo-300 mc-ripple">
+            <Link 
+              to="/udaan"
+              className="inline-flex items-center justify-center rounded-full border-2 border-indigo-200 bg-white px-6 py-3 text-sm font-semibold text-indigo-700 transition duration-150 ease-soft hover:bg-indigo-50 hover:border-indigo-300 mc-ripple"
+            >
               Learn More
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -149,7 +162,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-gradient-to-br from-indigo-500/15 to-violet-500/15 rounded-full animate-pulse-glow" />
       </section>
 
-      <section className="space-y-8">
+      <section id="assessment" className="space-y-8 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-indigo-600">
