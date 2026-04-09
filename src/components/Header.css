@@ -2,6 +2,9 @@
   background-color: #3730a3;
   color: #ffffff;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 .header-inner {
@@ -28,7 +31,6 @@
 }
 
 .brand-icon {
-  /* Legacy support - can be removed when fully migrated */
   width: 2.5rem;
   height: 2.5rem;
   display: inline-flex;
@@ -83,6 +85,9 @@
 @media (max-width: 768px) {
   .mobile-toggle {
     display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .nav-menu {
@@ -92,13 +97,35 @@
     gap: 0.75rem;
     display: none;
     margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .nav-menu.open {
     display: flex;
   }
 
+  .nav-menu .header-link {
+    padding: 0.75rem 0;
+    font-size: 1.125rem;
+    border-radius: 0.5rem;
+    text-align: center;
+  }
+
+  .nav-menu .header-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
   .header-inner {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
+    flex-wrap: nowrap;
+  }
+
+  .brand {
+    gap: 0.5rem;
+  }
+
+  .brand-text {
+    font-size: 1rem;
   }
 }

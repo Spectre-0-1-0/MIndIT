@@ -11,19 +11,24 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="header-inner">
-        <Link to="/" className="brand" onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}>
+      <div className="header-inner md:flex md:items-center md:justify-between md:px-4 md:py-3">
+        <Link 
+          to="/" 
+          className="brand flex items-center gap-2 md:gap-3" 
+          onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}
+        >
           <Logo
             variant="header"
             alt="MCheck - A UDAAN Initiative - Mental Health Assessment Platform"
             title="Go to homepage"
+            className="h-8 w-auto md:h-10"
           />
-          <span className="brand-text">MCheck</span>
+          <span className="brand-text text-white text-lg md:text-xl font-medium whitespace-nowrap">MCheck</span>
         </Link>
 
         <button
           type="button"
-          className="mobile-toggle"
+          className="mobile-toggle md:hidden flex items-center justify-center p-2 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700 min-w-[40px] min-h-[40px]"
           aria-label="Toggle navigation"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((prev) => !prev)}
@@ -33,7 +38,7 @@ export default function Header() {
           <span className="mobile-toggle-bar" />
         </button>
 
-        <nav className={`nav-menu ${menuOpen ? 'open' : ''}`}>
+        <nav className={`nav-menu ${menuOpen ? 'open' : ''} hidden md:flex md:items-center md:gap-6`}>
           <NavLink to="/" end className={navClass} onClick={() => { setMenuOpen(false); window.scrollTo(0, 0); }}>
             Home
           </NavLink>
