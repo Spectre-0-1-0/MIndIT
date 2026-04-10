@@ -120,7 +120,7 @@ export default function ContactUs() {
                 <span className="text-lg md:text-xl">📍</span>
                 <div>
                   <p className="text-xs md:text-sm font-semibold">Address</p>
-                  <p className="text-base md:text-lg font-semibold">GITAM (Deemed to be) University, Bengaluru</p>
+                  <p className="text-base md:text-lg font-semibold">SB 601<br/>GITAM (Deemed to be) University, Bengaluru</p>
                 </div>
               </div>
             </div>
