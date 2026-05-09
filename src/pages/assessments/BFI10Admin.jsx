@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function BFI10Admin() {
   const [authenticated, setAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [submissions, setSubmissions] = useState([]);
@@ -11,68 +12,145 @@ export default function BFI10Admin() {
   const [filterType, setFilterType] = useState('all'); // 'all', 'identified', 'anonymous'
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [stats, setStats] = useState({ total: 0, identified: 0, anonymous: 0, today: 0 });
+  const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
   const navigate = useNavigate();
 
   const ADMIN_PASSWORD = 'MUdaanM';
 
   useEffect(() => {
-    if (authenticated) {
-      loadSubmissions();
+    // Check if we have a valid token
+    if (token) {
+      verifyToken();
     }
-  }, [authenticated]);
+  }, []);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      setPasswordError('');
-      setPassword('');
-    } else {
-      setPasswordError('Invalid password. Please try again.');
-      setPassword('');
+  useEffect(() => {
+    if (authenticated && token) {
+      loadSubmissions();
+      loadStats();
+    }
+  }, [authenticated, token]);
+
+  const verifyToken = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/verify', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setAuthenticated(true);
+      } else {
+        // Token invalid, clear it
+        localStorage.removeItem('adminToken');
+        setToken('');
+      }
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      localStorage.removeItem('adminToken');
+      setToken('');
     }
   };
 
-  const loadSubmissions = () => {
-    const stored = JSON.parse(localStorage.getItem('bfi10Submissions') || '[]');
-    setSubmissions(stored);
-    applyFilters(stored, searchTerm, filterType);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setPasswordError('');
+
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const newToken = data.token;
+        setToken(newToken);
+        localStorage.setItem('adminToken', newToken);
+        setAuthenticated(true);
+        setPassword('');
+      } else {
+        setPasswordError(data.error || 'Login failed');
+        setPassword('');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setPasswordError('Network error. Please try again.');
+      setPassword('');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadSubmissions = async () => {
+    try {
+      const params = new URLSearchParams({
+        type: filterType,
+        search: searchTerm,
+        limit: '1000' // Load more for admin view
+      });
+
+      const response = await fetch(`http://localhost:3001/api/bfi10-submissions?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSubmissions(data.submissions);
+        setFilteredSubmissions(data.submissions);
+      } else {
+        console.error('Failed to load submissions');
+        if (response.status === 401) {
+          // Token expired
+          handleLogout();
+        }
+      }
+    } catch (error) {
+      console.error('Error loading submissions:', error);
+    }
+  };
+
+  const loadStats = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/bfi10-submissions/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
   };
 
   const applyFilters = (records, search, type) => {
-    let filtered = records;
-
-    // Filter by type
-    if (type === 'identified') {
-      filtered = filtered.filter(s => !s.anonymous);
-    } else if (type === 'anonymous') {
-      filtered = filtered.filter(s => s.anonymous);
-    }
-
-    // Filter by search term
-    if (search) {
-      const lowerSearch = search.toLowerCase();
-      filtered = filtered.filter(s => {
-        if (s.anonymous) return false;
-        return (
-          s.userInfo.fullName.toLowerCase().includes(lowerSearch) ||
-          s.userInfo.rollNumber.toLowerCase().includes(lowerSearch) ||
-          s.userInfo.email.toLowerCase().includes(lowerSearch)
-        );
-      });
-    }
-
-    setFilteredSubmissions(filtered);
+    // Since API handles filtering, just set the filtered submissions
+    setFilteredSubmissions(records);
   };
 
   const handleSearch = (value) => {
     setSearchTerm(value);
-    applyFilters(submissions, value, filterType);
+    // Reload with new search term
+    loadSubmissions();
   };
 
   const handleFilterChange = (value) => {
     setFilterType(value);
-    applyFilters(submissions, searchTerm, value);
+    // Reload with new filter
+    loadSubmissions();
   };
 
   const handleViewDetails = (submission) => {
@@ -80,13 +158,40 @@ export default function BFI10Admin() {
     setShowDetailsModal(true);
   };
 
-  const handleDeleteSubmission = (index) => {
+  const handleDeleteSubmission = async (submission) => {
     if (window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
-      const updated = submissions.filter((_, i) => i !== index);
-      localStorage.setItem('bfi10Submissions', JSON.stringify(updated));
-      setSubmissions(updated);
-      applyFilters(updated, searchTerm, filterType);
+      try {
+        const response = await fetch(`http://localhost:3001/api/bfi10-submissions/${submission.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          // Reload submissions
+          loadSubmissions();
+          loadStats();
+          // Close modal if open
+          setShowDetailsModal(false);
+          setSelectedSubmission(null);
+        } else {
+          alert('Failed to delete submission');
+        }
+      } catch (error) {
+        console.error('Error deleting submission:', error);
+        alert('Network error. Please try again.');
+      }
     }
+  };
+
+  const handleLogout = () => {
+    setAuthenticated(false);
+    setToken('');
+    localStorage.removeItem('adminToken');
+    setSubmissions([]);
+    setFilteredSubmissions([]);
+    setStats({ total: 0, identified: 0, anonymous: 0, today: 0 });
   };
 
   const handleExportCSV = () => {
@@ -174,9 +279,10 @@ export default function BFI10Admin() {
 
             <button
               type="submit"
-              className="w-full rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              disabled={loading}
+              className="w-full rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
 
@@ -201,10 +307,7 @@ export default function BFI10Admin() {
           <p className="mt-2 text-indigo-100">BFI-10 Assessment Submissions</p>
         </div>
         <button
-          onClick={() => {
-            setAuthenticated(false);
-            navigate('/');
-          }}
+          onClick={handleLogout}
           className="rounded-full bg-white/20 hover:bg-white/30 px-4 py-2 text-sm font-semibold text-white transition"
         >
           Logout
@@ -215,25 +318,19 @@ export default function BFI10Admin() {
       <div className="grid gap-4 md:grid-cols-4">
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
           <p className="text-sm text-slate-600">Total Submissions</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">{submissions.length}</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{stats.total}</p>
         </div>
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
           <p className="text-sm text-slate-600">Identified Submissions</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
-            {submissions.filter(s => !s.anonymous).length}
-          </p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{stats.identified}</p>
         </div>
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
           <p className="text-sm text-slate-600">Anonymous Submissions</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
-            {submissions.filter(s => s.anonymous).length}
-          </p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{stats.anonymous}</p>
         </div>
         <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-200">
-          <p className="text-sm text-slate-600">Average Sessions</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
-            {submissions.length}
-          </p>
+          <p className="text-sm text-slate-600">Today's Submissions</p>
+          <p className="mt-2 text-3xl font-bold text-slate-900">{stats.today}</p>
         </div>
       </div>
 
@@ -348,7 +445,7 @@ export default function BFI10Admin() {
                           View
                         </button>
                         <button
-                          onClick={() => handleDeleteSubmission(submissions.indexOf(submission))}
+                          onClick={() => handleDeleteSubmission(submission)}
                           className="px-3 py-1 rounded-lg bg-red-100 text-red-700 text-xs font-semibold hover:bg-red-200 transition"
                         >
                           Delete

@@ -57,7 +57,7 @@ const bfi10Questions = [
 
 export default function BFI10() {
   // User Info State
-  const [formStep, setFormStep] = useState('info'); // 'info', 'consent', 'assessment', 'results'
+  const [formStep, setFormStep] = useState('info'); // 'info', 'consent', 'assessment', 'submitting', 'results'
   const [anonymous, setAnonymous] = useState(false);
   const [userInfo, setUserInfo] = useState({
     fullName: '',
@@ -137,35 +137,57 @@ export default function BFI10() {
     setAnswers(newAnswers);
   };
 
-  const handleSubmitAssessment = (e) => {
+  const handleSubmitAssessment = async (e) => {
     e.preventDefault();
     if (answers.some(answer => answer === null)) {
       alert('Please answer all questions before submitting.');
       return;
     }
 
-    const oxygenScores = calculateBFI10Score(answers);
-    const interpretation = interpretBFI10(oxygenScores);
+    // Show loading state
+    setFormStep('submitting');
 
-    const assessmentRecord = {
-      userID: sessionId,
-      timestamp: new Date().toISOString(),
-      anonymous,
-      userInfo: anonymous ? null : userInfo,
-      consentGiven: consent,
-      responses: answers,
-      oceanScores: oxygenScores,
-      interpretation,
-    };
+    try {
+      const oxygenScores = calculateBFI10Score(answers);
+      const interpretation = interpretBFI10(oxygenScores);
 
-    // Store in localStorage
-    const storedRecords = JSON.parse(localStorage.getItem('bfi10Submissions') || '[]');
-    storedRecords.push(assessmentRecord);
-    localStorage.setItem('bfi10Submissions', JSON.stringify(storedRecords));
+      const submissionData = {
+        userID: sessionId,
+        timestamp: new Date().toISOString(),
+        anonymous,
+        userInfo: anonymous ? null : userInfo,
+        consentGiven: consent,
+        responses: answers,
+        oceanScores,
+        interpretation,
+      };
 
-    setResults(assessmentRecord);
-    setFormStep('results');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Send to backend API
+      const response = await fetch('http://localhost:3001/api/bfi10-submissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save submission');
+      }
+
+      const result = await response.json();
+      console.log('Submission saved:', result);
+
+      // Store locally for results display (fallback)
+      setResults(submissionData);
+      setFormStep('results');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (error) {
+      console.error('Error submitting assessment:', error);
+      alert('Failed to save your assessment. Please check your internet connection and try again.');
+      setFormStep('assessment'); // Return to assessment step
+    }
   };
 
   const handleDownloadResults = () => {
@@ -545,6 +567,24 @@ This assessment is for self-awareness purposes only and is not a clinical diagno
             Submit Assessment
           </button>
         </form>
+      </section>
+    );
+  }
+
+  // STEP 3.5: SUBMITTING
+  if (formStep === 'submitting') {
+    return (
+      <section className="space-y-6 rounded-3xl bg-white p-6 shadow-sm sm:p-8">
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 rounded-full mb-4">
+            <svg className="w-8 h-8 text-indigo-600 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <h2 className="text-2xl font-semibold text-slate-900 mb-2">Submitting Your Assessment</h2>
+          <p className="text-slate-600">Please wait while we save your responses...</p>
+        </div>
       </section>
     );
   }

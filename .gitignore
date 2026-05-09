@@ -7,3 +7,6 @@ yarn-error.log
 /coverage
 /.idea
 /.vscode
+
+# SQLite database file for local backend development
+data/mindcheck.db
