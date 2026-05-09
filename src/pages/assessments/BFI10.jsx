@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { calculateBFI10Score, interpretBFI10 } from '../../data/scoring';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const bfi10Questions = [
   {
     text: 'I am reserved.',
@@ -163,7 +165,7 @@ export default function BFI10() {
       };
 
       // Send to backend API
-      const response = await fetch('http://localhost:3001/api/bfi10-submissions', {
+      const response = await fetch(`${API_BASE}/api/bfi10-submissions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

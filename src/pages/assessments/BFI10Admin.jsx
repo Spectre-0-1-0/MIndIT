@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export default function BFI10Admin() {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ export default function BFI10Admin() {
 
   const verifyToken = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/verify', {
+      const response = await fetch(`${API_BASE}/api/auth/verify`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -60,7 +62,7 @@ export default function BFI10Admin() {
     setPasswordError('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +99,7 @@ export default function BFI10Admin() {
         limit: '1000' // Load more for admin view
       });
 
-      const response = await fetch(`http://localhost:3001/api/bfi10-submissions?${params}`, {
+      const response = await fetch(`${API_BASE}/api/bfi10-submissions?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -121,7 +123,7 @@ export default function BFI10Admin() {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/bfi10-submissions/stats', {
+      const response = await fetch(`${API_BASE}/api/bfi10-submissions/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -161,7 +163,7 @@ export default function BFI10Admin() {
   const handleDeleteSubmission = async (submission) => {
     if (window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
       try {
-        const response = await fetch(`http://localhost:3001/api/bfi10-submissions/${submission.id}`, {
+        const response = await fetch(`${API_BASE}/api/bfi10-submissions/${submission.id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
