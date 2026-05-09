@@ -6,6 +6,7 @@ export const scoreRanges = {
   rses: [0, 30],
   bdi2: [0, 63],
   bai: [0, 63],
+  bfi10: [1, 5],
 };
 
 const average = (values) => {
@@ -342,6 +343,111 @@ export function interpretBai(score) {
   };
 }
 
+export function calculateBFI10Score(answers) {
+  if (!Array.isArray(answers) || answers.length !== 10) return {};
+
+  // BFI-10 has 10 items mapping to 5 traits
+  // Item mapping: 1=E, 2=A, 3=C, 4=N, 5=O, 6=E, 7=A, 8=C, 9=N, 10=O
+  // With reverse scoring for items: 1, 3, 6, 9
+
+  const scored = answers.map((value, index) => {
+    const numeric = Number(value || 0);
+    // Reverse score items 1, 3, 6, 9 (indices 0, 2, 5, 8)
+    if ([0, 2, 5, 8].includes(index)) {
+      return 6 - numeric; // Reverse: 1->5, 2->4, 3->3, 4->2, 5->1
+    }
+    return numeric;
+  });
+
+  // Calculate trait scores (average of 2 items each)
+  const openness = (scored[4] + scored[9]) / 2; // Items 5, 10
+  const conscientiousness = (scored[2] + scored[7]) / 2; // Items 3, 8 (reversed + normal)
+  const extraversion = (scored[0] + scored[5]) / 2; // Items 1, 6 (both reversed)
+  const agreeableness = (scored[1] + scored[6]) / 2; // Items 2, 7
+  const neuroticism = (scored[3] + scored[8]) / 2; // Items 4, 9
+
+  return {
+    openness,
+    conscientiousness,
+    extraversion,
+    agreeableness,
+    neuroticism,
+  };
+}
+
+export function interpretBFI10(scores) {
+  const interpretTrait = (score) => {
+    if (score >= 4.5) return { level: 'Very High', description: 'You exhibit very strong characteristics in this trait.' };
+    if (score >= 3.5) return { level: 'High', description: 'You show notably strong characteristics in this trait.' };
+    if (score >= 2.5) return { level: 'Moderate', description: 'You show average levels of this trait.' };
+    if (score >= 1.5) return { level: 'Low', description: 'You show lower levels of this trait.' };
+    return { level: 'Very Low', description: 'You exhibit very low characteristics in this trait.' };
+  };
+
+  return {
+    openness: {
+      score: scores.openness,
+      ...interpretTrait(scores.openness),
+      details: [
+        scores.openness >= 3.5
+          ? 'You are intellectually curious, creative, and open to new experiences. You likely enjoy exploring new ideas and trying novel approaches.'
+          : 'You tend to prefer familiar routines and practical approaches. You may be more traditional in your thinking and values.',
+        scores.openness >= 3.5
+          ? 'Your abstract thinking and creativity can be assets in problem-solving and innovation.'
+          : 'Your preference for stability and proven methods can provide consistency and reliability.',
+      ],
+    },
+    conscientiousness: {
+      score: scores.conscientiousness,
+      ...interpretTrait(scores.conscientiousness),
+      details: [
+        scores.conscientiousness >= 3.5
+          ? 'You are organized, disciplined, and dependable. You likely plan ahead and take your responsibilities seriously.'
+          : 'You may be more spontaneous and flexible. You tend to be relaxed about rules and schedules.',
+        scores.conscientiousness >= 3.5
+          ? 'Your strong work ethic and organizational skills can help you achieve your goals.'
+          : 'Your flexibility allows you to adapt to changing circumstances more easily.',
+      ],
+    },
+    extraversion: {
+      score: scores.extraversion,
+      ...interpretTrait(scores.extraversion),
+      details: [
+        scores.extraversion >= 3.5
+          ? 'You are outgoing, energetic, and sociable. You enjoy being around others and are comfortable taking center stage.'
+          : 'You are more reserved and introspective. You prefer smaller groups and may need time to recharge after social interaction.',
+        scores.extraversion >= 3.5
+          ? 'Your social confidence and enthusiasm can inspire others and build strong social networks.'
+          : 'Your reflective nature allows for deep thinking and meaningful one-on-one connections.',
+      ],
+    },
+    agreeableness: {
+      score: scores.agreeableness,
+      ...interpretTrait(scores.agreeableness),
+      details: [
+        scores.agreeableness >= 3.5
+          ? 'You are compassionate, cooperative, and concerned about others. You value harmony and are quick to forgive.'
+          : 'You are independent, competitive, and direct in your communication. You prioritize your own interests and may be skeptical of others.',
+        scores.agreeableness >= 3.5
+          ? 'Your empathy and cooperation skills make you an excellent team member and supportive friend.'
+          : 'Your independence and critical thinking can help you make objective decisions.',
+      ],
+    },
+    neuroticism: {
+      score: scores.neuroticism,
+      ...interpretTrait(scores.neuroticism),
+      details: [
+        scores.neuroticism >= 3.5
+          ? 'You tend to experience more negative emotions and may be sensitive to stress. You worry more than average and can be anxious.'
+          : 'You are generally emotionally stable and calm. You handle stress well and maintain composure.',
+        scores.neuroticism >= 3.5
+          ? 'Developing stress management techniques and emotional awareness can help you maintain well-being.'
+          : 'Your emotional stability is a strength that helps you navigate challenges effectively.',
+      ],
+    },
+  };
+}
+
 export function interpretAssessment(type, value) {
   switch (type) {
     case 'ghq12':
@@ -359,6 +465,8 @@ export function interpretAssessment(type, value) {
       return interpretBdi2(value);
     case 'bai':
       return interpretBai(value);
+    case 'bfi10':
+      return interpretBFI10(value);
     default:
       return {
         title: 'Assessment Result',

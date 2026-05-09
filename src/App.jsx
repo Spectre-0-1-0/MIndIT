@@ -12,6 +12,8 @@ import PSS10 from './pages/assessments/PSS10';
 import RSes from './pages/assessments/RSes';
 import Bdi2 from './pages/assessments/Bdi2';
 import Bai from './pages/assessments/Bai';
+import BFI10 from './pages/assessments/BFI10';
+import BFI10Admin from './pages/assessments/BFI10Admin';
 
 const assessmentMap = {
   ghq12: <GHQ12 />,
@@ -21,6 +23,7 @@ const assessmentMap = {
   rses: <RSes />,
   bdi2: <Bdi2 />,
   bai: <Bai />,
+  bfi10: <BFI10 />,
 };
 
 function AssessmentRoute() {
@@ -45,6 +48,7 @@ export default function App() {
           <Route path="/results" element={<ResultsPage />} />
           <Route path="/udaan" element={<UdaanPage />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/bfi10-admin" element={<BFI10Admin />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

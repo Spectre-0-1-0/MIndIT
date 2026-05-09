@@ -53,6 +53,13 @@ const assessments = [
     time: '8',
     icon: '🌊',
   },
+  {
+    id: 'bfi10',
+    title: 'BFI-10',
+    description: 'Discover your Big Five personality traits with this brief assessment.',
+    time: '5',
+    icon: '🎯',
+  },
 ];
 
 function FloatingParticles() {
