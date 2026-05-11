@@ -41,6 +41,8 @@ function getDisplayTitle(result) {
       return 'BDI-II';
     case 'bai':
       return 'BAI';
+    case 'bfi10':
+      return 'BFI-10 Personality Profile';
     default:
       return 'Assessment';
   }
@@ -48,6 +50,14 @@ function getDisplayTitle(result) {
 
 function getDefaultInterpretation(result) {
   const { assessmentId, score, interpretation } = result;
+
+  if (assessmentId === 'bfi10') {
+    return {
+      title: 'BFI-10 Personality Profile',
+      description: 'Your Big Five trait scores are shown below with interpretation for each trait.',
+      details: [],
+    };
+  }
 
   // If we have a structured interpretation from scoring.js, use it
   if (interpretation && typeof interpretation === 'object') {
@@ -112,6 +122,8 @@ function getDetailText(result) {
     case 'digital-stress-scale':
     case 'digitalStress':
       return 'The Digital Stress Scale evaluates how online life affects your stress. Consider adjusting habits and boundaries if your result suggests moderate or high digital strain.';
+    case 'bfi10':
+      return 'The BFI-10 assesses your Big Five personality traits. Each score reflects an average of two items and can help you understand your characteristic tendencies.';
     default:
       return 'This result is provided for informational purposes only. Use it to reflect on your mental wellness and consider supportive next steps.';
   }
@@ -252,6 +264,49 @@ export default function ResultsPage() {
                 <p className="text-slate-700 leading-7">{getDetailText(result)}</p>
               </div>
             </section>
+
+            {result.assessmentId === 'bfi10' && result.oceanScores && result.interpretation && (
+              <section className="rounded-[1.5rem] bg-white p-8 shadow-sm">
+                <h2 className="text-2xl font-semibold text-slate-900">Your BFI-10 Trait Scores</h2>
+                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                  {Object.entries(result.oceanScores).map(([trait, score]) => {
+                    const traitInfo = result.interpretation[trait] || {};
+                    const labelMap = {
+                      openness: 'Openness',
+                      conscientiousness: 'Conscientiousness',
+                      extraversion: 'Extraversion',
+                      agreeableness: 'Agreeableness',
+                      neuroticism: 'Neuroticism',
+                    };
+                    return (
+                      <div key={trait} className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+                        <div className="flex items-center justify-between gap-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-slate-900">{labelMap[trait] || trait}</h3>
+                            <p className="text-sm text-slate-500">{traitInfo.level || 'Trait score'}</p>
+                          </div>
+                          <span className="rounded-full bg-indigo-600 px-3 py-1 text-sm font-semibold text-white">{score.toFixed(2)}/5</span>
+                        </div>
+                        <div className="mt-4 h-3 w-full rounded-full bg-slate-200 overflow-hidden">
+                          <div className="h-full bg-indigo-600" style={{ width: `${(score / 5) * 100}%` }} />
+                        </div>
+                        <p className="mt-4 text-slate-700 leading-relaxed">{traitInfo.description || 'No interpretation available.'}</p>
+                        {traitInfo.details && traitInfo.details.length > 0 && (
+                          <ul className="mt-4 space-y-2 text-slate-600">
+                            {traitInfo.details.map((detail, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="mt-1 text-indigo-600">•</span>
+                                <span>{detail}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             <section className="rounded-[1.5rem] bg-white p-8 shadow-sm">
               <h2 className="text-2xl font-semibold text-slate-900">Important disclaimer</h2>

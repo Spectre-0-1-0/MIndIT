@@ -124,7 +124,25 @@ router.post('/submissions', validateBFI10Submission, async (req, res) => {
   }
 });
 
-// GET /api/bfi10-submissions - Get all submissions (admin only)
+// GET /api/bfi10-submissions/stats - Get submission statistics (admin only)
+router.get('/submissions/stats', verifyAdmin, async (req, res) => {
+  try {
+    const totalResult = await getQuery('SELECT COUNT(*) as total FROM bfi10_submissions');
+    const identifiedResult = await getQuery("SELECT COUNT(*) as identified FROM bfi10_submissions WHERE submission_mode = 'identified'");
+    const anonymousResult = await getQuery("SELECT COUNT(*) as anonymous FROM bfi10_submissions WHERE submission_mode = 'anonymous'");
+    const todayResult = await getQuery("SELECT COUNT(*) as today FROM bfi10_submissions WHERE DATE(created_at) = DATE('now')");
+
+    res.json({
+      total: parseInt(totalResult.total, 10) || 0,
+      identified: parseInt(identifiedResult.identified, 10) || 0,
+      anonymous: parseInt(anonymousResult.anonymous, 10) || 0,
+      today: parseInt(todayResult.today, 10) || 0
+    });
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
+  }
+});
 router.get('/submissions', verifyAdmin, [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),

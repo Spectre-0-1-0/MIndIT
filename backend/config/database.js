@@ -54,16 +54,63 @@ const createTablesSQL = `
       CREATE INDEX IF NOT EXISTS idx_bfi10_submissions_user_id ON bfi10_submissions(user_id);
     `;
 
-    db.exec(createTablesSQL, (err) => {
+    db.exec(createTablesSQL, async (err) => {
       if (err) {
         console.error('❌ Error creating tables:', err);
         reject(err);
-      } else {
+        return;
+      }
+
+      try {
+        await migrateBfi10Schema();
         console.log('✅ Database tables initialized');
         resolve();
+      } catch (migrationErr) {
+        console.error('❌ Error migrating database schema:', migrationErr);
+        reject(migrationErr);
       }
     });
   });
+};
+
+const getTableInfo = (tableName) => {
+  return new Promise((resolve, reject) => {
+    db.all(`PRAGMA table_info(${tableName})`, (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows.map((row) => row.name));
+    });
+  });
+};
+
+const migrateBfi10Schema = async () => {
+  const tableName = 'bfi10_submissions';
+  const columns = await getTableInfo(tableName).catch(() => []);
+  const requiredColumns = [
+    { name: 'timestamp', sql: "ALTER TABLE bfi10_submissions ADD COLUMN timestamp DATETIME DEFAULT CURRENT_TIMESTAMP" },
+    { name: 'submission_mode', sql: "ALTER TABLE bfi10_submissions ADD COLUMN submission_mode TEXT CHECK(submission_mode IN ('anonymous', 'identified'))" },
+    { name: 'user_info', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN user_info TEXT' },
+    { name: 'consent_given', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN consent_given BOOLEAN DEFAULT 0' },
+    { name: 'responses', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN responses TEXT' },
+    { name: 'scores', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN scores TEXT' },
+    { name: 'interpretation', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN interpretation TEXT' },
+    { name: 'created_at', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP' },
+    { name: 'updated_at', sql: 'ALTER TABLE bfi10_submissions ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP' },
+  ];
+
+  for (const column of requiredColumns) {
+    if (!columns.includes(column.name)) {
+      await new Promise((resolve, reject) => {
+        db.run(column.sql, (err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          console.log(`✅ Added missing column ${column.name} to ${tableName}`);
+          resolve();
+        });
+      });
+    }
+  }
 };
 
 // Insert default admin user if not exists

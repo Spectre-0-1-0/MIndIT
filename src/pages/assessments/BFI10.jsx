@@ -49,7 +49,6 @@ export default function BFI10() {
   const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -128,8 +127,28 @@ export default function BFI10() {
       }
 
       await response.json();
-      setResults(submissionData);
-      setStep('results');
+      navigate('/results', {
+        state: {
+          result: {
+            assessmentId: 'bfi10',
+            title: 'BFI-10 Personality Profile',
+            userName: anonymous ? 'Anonymous' : userData.name,
+            anonymous,
+            userInfo: anonymous ? null : {
+              fullName: userData.name,
+              rollNumber: userData.rollNumber,
+              email: userData.email,
+              phone: userData.phone || null,
+              department: userData.department || null,
+              academicYear: userData.academicYear || null,
+            },
+            score: null,
+            oceanScores,
+            interpretation,
+            responses: answers,
+          },
+        },
+      });
     } catch (err) {
       console.error("Submission error:", err);
       setError('Failed to save assessment. Please check your connection.');
@@ -139,39 +158,6 @@ export default function BFI10() {
     }
   };
 
-  if (step === 'results' && results) {
-    return (
-      <section className="space-y-8 rounded-[2rem] bg-white p-6 shadow-lg sm:p-10">
-        <header className="space-y-3 text-center">
-          <h1 className="text-3xl font-bold text-slate-900">Your Personality Profile</h1>
-          <p className="text-slate-600">BFI-10 Assessment Results</p>
-        </header>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          {Object.entries(results.oceanScores).map(([trait, score]) => {
-            const traitInfo = results.interpretation[trait] || {};
-            return (
-              <div key={trait} className="rounded-3xl border border-slate-100 bg-slate-50/50 p-6 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-slate-900">{traitNames[trait] || trait}</h3>
-                  <span className="text-sm font-black text-indigo-600">{score.toFixed(2)}/5</span>
-                </div>
-                <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
-                  <div className="h-full bg-indigo-600 transition-all duration-1000" style={{ width: `${(score/5)*100}%` }} />
-                </div>
-                <p className="text-sm text-slate-600 leading-relaxed">{traitInfo.description || traitInfo}</p>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <button onClick={() => window.print()} className="flex-1 rounded-full border-2 border-slate-200 py-4 font-bold text-slate-700 hover:bg-slate-50">Print Results</button>
-          <button onClick={() => navigate('/')} className="flex-1 rounded-full bg-indigo-600 py-4 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700">Return Home</button>
-        </div>
-      </section>
-    );
-  }
 
   if (step === 'submitting') {
     return (
