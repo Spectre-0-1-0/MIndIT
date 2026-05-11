@@ -1,8 +1,16 @@
+const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Database configuration - using SQLite for development
-const dbPath = path.join(__dirname, '../../data/mindcheck.db');
+const DEFAULT_ADMIN_PASSWORD = process.env.DEFAULT_ADMIN_PASSWORD;
+if (!DEFAULT_ADMIN_PASSWORD) {
+  throw new Error('DEFAULT_ADMIN_PASSWORD environment variable is required');
+}
+
+const dbPath = process.env.DB_PATH
+  ? path.resolve(process.env.DB_PATH)
+  : path.join(__dirname, '../../data/mindcheck.db');
+fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('❌ Database connection failed:', err.message);
@@ -78,7 +86,7 @@ const createDefaultAdmin = () => {
       }
 
       // Create admin user
-      bcrypt.hash(defaultPassword, 10, (err, hashedPassword) => {
+      bcrypt.hash(DEFAULT_ADMIN_PASSWORD, 10, (err, hashedPassword) => {
         if (err) {
           reject(err);
           return;

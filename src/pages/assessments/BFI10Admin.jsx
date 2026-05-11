@@ -18,8 +18,6 @@ export default function BFI10Admin() {
   const [token, setToken] = useState(localStorage.getItem('adminToken') || '');
   const navigate = useNavigate();
 
-  const ADMIN_PASSWORD = 'MUdaanM';
-
   useEffect(() => {
     // Check if we have a valid token
     if (token) {
@@ -575,12 +573,7 @@ export default function BFI10Admin() {
             </button>
           </div>
         </div>
-<<<<<<< HEAD
-      )}
-    </section>
-=======
       ) : null}
     </section>
   );
 }
->>>>>>> c57378d (fix vercel deployment and build configuration)

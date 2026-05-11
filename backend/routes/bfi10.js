@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
 const runQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
@@ -44,7 +49,7 @@ const verifyAdmin = (req, res, next) => {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-in-production');
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     if (decoded.role !== 'admin') {
       return res.status(403).json({ error: 'Admin access required' });

@@ -6,6 +6,11 @@ const { db } = require('../config/database');
 
 const router = express.Router();
 
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
+
 const getQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.get(sql, params, (err, row) => {
@@ -58,7 +63,7 @@ router.post('/login', [
         username: admin.username,
         role: admin.role || 'admin'
       },
-      process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
 
@@ -87,7 +92,7 @@ router.get('/verify', async (req, res) => {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-in-production');
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     res.json({
       valid: true,

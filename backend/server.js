@@ -9,6 +9,14 @@ const authRoutes = require('./routes/auth');
 const bfi10Routes = require('./routes/bfi10');
 const { initializeDatabase } = require('./config/database');
 
+const REQUIRED_ENV_VARS = ['JWT_SECRET', 'DEFAULT_ADMIN_PASSWORD'];
+REQUIRED_ENV_VARS.forEach((envVar) => {
+  if (!process.env[envVar]) {
+    console.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+});
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -64,7 +72,7 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
 });
