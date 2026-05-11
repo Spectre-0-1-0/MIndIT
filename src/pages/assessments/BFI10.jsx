@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { interpretBFI10 } from '../../data/scoring';
+import { calculateBFI10Score, interpretBFI10 } from '../../data/scoring';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -32,43 +32,6 @@ const traitNames = {
   A: 'Agreeableness',
   N: 'Neuroticism',
 };
-
-function calculateBFI10Score(answers) {
-  if (!Array.isArray(answers) || answers.length !== questions.length) return {};
-
-  const traitTotals = {
-    openness: { sum: 0, count: 0 },
-    conscientiousness: { sum: 0, count: 0 },
-    extraversion: { sum: 0, count: 0 },
-    agreeableness: { sum: 0, count: 0 },
-    neuroticism: { sum: 0, count: 0 },
-  };
-
-  const traitMap = {
-    O: 'openness',
-    C: 'conscientiousness',
-    E: 'extraversion',
-    A: 'agreeableness',
-    N: 'neuroticism',
-  };
-
-  questions.forEach((question, index) => {
-    const value = Number(answers[index]);
-    if (!value || value < 1 || value > 5) return;
-    const scoredValue = question.reverse ? 6 - value : value;
-    const traitKey = traitMap[question.trait];
-    if (!traitKey) return;
-    traitTotals[traitKey].sum += scoredValue;
-    traitTotals[traitKey].count += 1;
-  });
-
-  return Object.fromEntries(
-    Object.entries(traitTotals).map(([trait, totals]) => [
-      trait,
-      totals.count > 0 ? totals.sum / totals.count : 0,
-    ])
-  );
-}
 
 export default function BFI10() {
   const [step, setStep] = useState('userData'); // 'userData', 'consent', 'assessment', 'submitting', 'results'
