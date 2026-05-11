@@ -90,6 +90,107 @@ export function calculateBaiScore(answers) {
   return answers.reduce((sum, value) => sum + Number(value || 0), 0);
 }
 
+// BFI-10 Scoring Functions
+// BFI-10 uses 10 questions to measure 5 traits (O, C, E, A, N)
+// Each trait is measured by 2 items
+
+export function calculateBFI10Score(answers, questions) {
+  if (!Array.isArray(answers) || !Array.isArray(questions)) {
+    return { O: 0, C: 0, E: 0, A: 0, N: 0 };
+  }
+
+  // Group questions by trait
+  const traitQuestions = {
+    O: [], // Openness
+    C: [], // Conscientiousness
+    E: [], // Extraversion
+    A: [], // Agreeableness
+    N: [], // Neuroticism
+  };
+
+  questions.forEach((q, index) => {
+    if (traitQuestions[q.trait]) {
+      traitQuestions[q.trait].push({
+        value: answers[index],
+        reverse: q.reverse || false,
+      });
+    }
+  });
+
+  // Calculate average score for each trait (scale 1-5, convert to 1-10)
+  const traits = {};
+  Object.keys(traitQuestions).forEach((trait) => {
+    const items = traitQuestions[trait];
+    if (items.length > 0) {
+      const sum = items.reduce((acc, item) => {
+        let val = item.value || 0;
+        if (item.reverse) {
+          val = 6 - val; // Reverse score (1->5, 2->4, 3->3, 4->2, 5->1)
+        }
+        return acc + val;
+      }, 0);
+      // Convert from 1-5 scale to 1-10 scale
+      const avg = (sum / items.length) * 2;
+      traits[trait] = Math.round(avg);
+    } else {
+      traits[trait] = 0;
+    }
+  });
+
+  return traits;
+}
+
+export function interpretBFI10(traits) {
+  const interpretation = {};
+
+  // Openness interpretation
+  if (traits.O >= 8) {
+    interpretation.O = 'High openness: You are imaginative, curious, and appreciate art and new experiences.';
+  } else if (traits.O >= 5) {
+    interpretation.O = 'Moderate openness: You have a balanced appreciation for both tradition and novelty.';
+  } else {
+    interpretation.O = 'Lower openness: You prefer familiar routines and practical approaches.';
+  }
+
+  // Conscientiousness interpretation
+  if (traits.C >= 8) {
+    interpretation.C = 'High conscientiousness: You are organized, disciplined, and goal-oriented.';
+  } else if (traits.C >= 5) {
+    interpretation.C = 'Moderate conscientiousness: You balance planning with flexibility.';
+  } else {
+    interpretation.C = 'Lower conscientiousness: You may prefer spontaneity over strict organization.';
+  }
+
+  // Extraversion interpretation
+  if (traits.E >= 8) {
+    interpretation.E = 'High extraversion: You are sociable, energetic, and enjoy being around people.';
+  } else if (traits.E >= 5) {
+    interpretation.E = 'Moderate extraversion: You enjoy social interaction but also value alone time.';
+  } else {
+    interpretation.E = 'Lower extraversion: You tend to be reserved and prefer quieter environments.';
+  }
+
+  // Agreeableness interpretation
+  if (traits.A >= 8) {
+    interpretation.A = 'High agreeableness: You are compassionate, trusting, and cooperative with others.';
+  } else if (traits.A >= 5) {
+    interpretation.A = 'Moderate agreeableness: You balance cooperation with assertiveness.';
+  } else {
+    interpretation.A = 'Lower agreeableness: You may be more skeptical and competitive in nature.';
+  }
+
+  // Neuroticism interpretation
+  if (traits.N >= 8) {
+    interpretation.N = 'Higher neuroticism: You may experience more stress and emotional ups and downs.';
+  } else if (traits.N >= 5) {
+    interpretation.N = 'Moderate neuroticism: You experience a normal range of emotional responses.';
+  } else {
+    interpretation.N = 'Lower neuroticism: You are generally calm and emotionally stable.';
+  }
+
+  return interpretation;
+}
+
 export function interpretGHQ12(score) {
   if (score <= 11) {
     return {

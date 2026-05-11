@@ -18,14 +18,17 @@ db.run('PRAGMA foreign_keys = ON');
 const initializeDatabase = async () => {
   return new Promise((resolve, reject) => {
     // Create tables if they don't exist
-    const createTablesSQL = `
+const createTablesSQL = `
       CREATE TABLE IF NOT EXISTS bfi10_submissions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         submission_mode TEXT CHECK(submission_mode IN ('anonymous', 'identified')),
+        user_info TEXT,
         consent_given BOOLEAN DEFAULT 0,
-        responses TEXT, -- JSON string
-        scores TEXT, -- JSON string
+        responses TEXT,
+        scores TEXT,
+        interpretation TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
@@ -34,6 +37,8 @@ const initializeDatabase = async () => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
+        role TEXT DEFAULT 'admin',
+        last_login DATETIME,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -80,8 +85,8 @@ const createDefaultAdmin = () => {
         }
 
         db.run(
-          'INSERT INTO admin_users (username, password_hash) VALUES (?, ?)',
-          ['admin', hashedPassword],
+          'INSERT INTO admin_users (username, password_hash, role) VALUES (?, ?, ?)',
+          ['admin', hashedPassword, 'admin'],
           function(err) {
             if (err) {
               reject(err);

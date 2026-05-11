@@ -96,10 +96,10 @@ export default function BFI10Admin() {
       const params = new URLSearchParams({
         type: filterType,
         search: searchTerm,
-        limit: '1000' // Load more for admin view
+        limit: '1000'
       });
 
-      const response = await fetch(`${API_BASE}/api/bfi10-submissions?${params}`, {
+      const response = await fetch(`${API_BASE}/api/bfi10/submissions?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -112,7 +112,6 @@ export default function BFI10Admin() {
       } else {
         console.error('Failed to load submissions');
         if (response.status === 401) {
-          // Token expired
           handleLogout();
         }
       }
@@ -123,7 +122,7 @@ export default function BFI10Admin() {
 
   const loadStats = async () => {
     try {
-      const response = await fetch(`${API_BASE}/api/bfi10-submissions/stats`, {
+      const response = await fetch(`${API_BASE}/api/bfi10/submissions/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -163,7 +162,7 @@ export default function BFI10Admin() {
   const handleDeleteSubmission = async (submission) => {
     if (window.confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
       try {
-        const response = await fetch(`${API_BASE}/api/bfi10-submissions/${submission.id}`, {
+        const response = await fetch(`${API_BASE}/api/bfi10/submissions/${submission.id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -171,10 +170,8 @@ export default function BFI10Admin() {
         });
 
         if (response.ok) {
-          // Reload submissions
           loadSubmissions();
           loadStats();
-          // Close modal if open
           setShowDetailsModal(false);
           setSelectedSubmission(null);
         } else {
@@ -580,5 +577,3 @@ export default function BFI10Admin() {
         </div>
       )}
     </section>
-  );
-}

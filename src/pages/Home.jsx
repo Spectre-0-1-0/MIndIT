@@ -56,9 +56,9 @@ const assessments = [
   {
     id: 'bfi10',
     title: 'BFI-10',
-    description: 'Discover your Big Five personality traits with this brief assessment.',
-    time: '5',
-    icon: '🎯',
+    description: 'Big Five personality assessment measuring Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism.',
+    time: '10',
+    icon: '⭐',
   },
 ];
 
