@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { calculateBFI10Score, interpretBFI10 } from '../../data/scoring';
+import { useNavigate } from 'react-router-dom';
+import { interpretBFI10 } from '../../data/scoring';
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
@@ -32,6 +32,43 @@ const traitNames = {
   A: 'Agreeableness',
   N: 'Neuroticism',
 };
+
+function calculateBFI10Score(answers) {
+  if (!Array.isArray(answers) || answers.length !== questions.length) return {};
+
+  const traitTotals = {
+    openness: { sum: 0, count: 0 },
+    conscientiousness: { sum: 0, count: 0 },
+    extraversion: { sum: 0, count: 0 },
+    agreeableness: { sum: 0, count: 0 },
+    neuroticism: { sum: 0, count: 0 },
+  };
+
+  const traitMap = {
+    O: 'openness',
+    C: 'conscientiousness',
+    E: 'extraversion',
+    A: 'agreeableness',
+    N: 'neuroticism',
+  };
+
+  questions.forEach((question, index) => {
+    const value = Number(answers[index]);
+    if (!value || value < 1 || value > 5) return;
+    const scoredValue = question.reverse ? 6 - value : value;
+    const traitKey = traitMap[question.trait];
+    if (!traitKey) return;
+    traitTotals[traitKey].sum += scoredValue;
+    traitTotals[traitKey].count += 1;
+  });
+
+  return Object.fromEntries(
+    Object.entries(traitTotals).map(([trait, totals]) => [
+      trait,
+      totals.count > 0 ? totals.sum / totals.count : 0,
+    ])
+  );
+}
 
 export default function BFI10() {
   const [step, setStep] = useState('userData'); // 'userData', 'consent', 'assessment', 'submitting', 'results'
@@ -127,7 +164,7 @@ export default function BFI10() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
+      await response.json();
       setResults(submissionData);
       setStep('results');
     } catch (err) {
@@ -153,7 +190,7 @@ export default function BFI10() {
             return (
               <div key={trait} className="rounded-3xl border border-slate-100 bg-slate-50/50 p-6 space-y-4">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-slate-900 capitalize">{trait}</h3>
+                  <h3 className="font-bold text-slate-900">{traitNames[trait] || trait}</h3>
                   <span className="text-sm font-black text-indigo-600">{score.toFixed(2)}/5</span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
@@ -359,6 +396,19 @@ export default function BFI10() {
           >
             Continue to Consent
           </button>
+        </div>
+        <div className="pt-6 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('bfi10AdminEntry', 'true');
+              navigate('/bfi10-admin', { state: { fromAssessmentStart: true } });
+            }}
+            className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+          >
+            Admin Dashboard Access
+          </button>
+          <p className="text-xs text-slate-400">This admin panel is available only from the BFI-10 assessment start page.</p>
         </div>
       </div>
     </section>

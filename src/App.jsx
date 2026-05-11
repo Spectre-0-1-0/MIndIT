@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -37,6 +37,15 @@ function AssessmentRoute() {
   return <div className="space-y-8">{assessmentComponent}</div>;
 }
 
+function AdminRoute() {
+  const location = useLocation();
+  const hasEntryToken = location.state?.fromAssessmentStart || localStorage.getItem('bfi10AdminEntry');
+  if (!hasEntryToken) {
+    return <Navigate to="/assessment/bfi10" replace />;
+  }
+  return <BFI10Admin />;
+}
+
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-slate-50 to-white text-slate-900">
@@ -48,7 +57,7 @@ export default function App() {
           <Route path="/results" element={<ResultsPage />} />
           <Route path="/udaan" element={<UdaanPage />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/bfi10-admin" element={<BFI10Admin />} />
+          <Route path="/bfi10-admin" element={<AdminRoute />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

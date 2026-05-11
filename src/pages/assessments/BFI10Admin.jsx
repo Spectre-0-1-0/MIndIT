@@ -186,6 +186,7 @@ export default function BFI10Admin() {
     setAuthenticated(false);
     setToken('');
     localStorage.removeItem('adminToken');
+    localStorage.removeItem('bfi10AdminEntry');
     setSubmissions([]);
     setFilteredSubmissions([]);
     setStats({ total: 0, identified: 0, anonymous: 0, today: 0 });
