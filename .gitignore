@@ -8,5 +8,10 @@ yarn-error.log
 /.idea
 /.vscode
 
+# Environment files
+.env
+.env.*
+!.env.example
+
 # SQLite database file for local backend development
 data/mindcheck.db

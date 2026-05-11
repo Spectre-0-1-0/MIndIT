@@ -1,6 +1,7 @@
 {
   "name": "mindcheck",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "description": "MindCheck - Student Mental Health Assessment Platform",
   "scripts": {

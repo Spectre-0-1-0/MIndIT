@@ -460,7 +460,7 @@ export default function BFI10Admin() {
       </div>
 
       {/* Details Modal */}
-      {showDetailsModal && selectedSubmission && (
+      {showDetailsModal && selectedSubmission ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-2xl rounded-3xl bg-white p-8 shadow-xl max-h-screen overflow-y-auto space-y-6">
             <header className="space-y-2">
@@ -575,5 +575,12 @@ export default function BFI10Admin() {
             </button>
           </div>
         </div>
+<<<<<<< HEAD
       )}
     </section>
+=======
+      ) : null}
+    </section>
+  );
+}
+>>>>>>> c57378d (fix vercel deployment and build configuration)
