@@ -1,222 +1,171 @@
-export const scoreRanges = {
-  ghq12: [0, 36],
-  flourishing: [8, 56],
-  digitalStress: [24, 120],
-  pss10: [0, 40],
-  rses: [0, 30],
-  bdi2: [0, 63],
-  bai: [0, 63],
-  bfi10: [1, 5],
-};
-
-const average = (values) => {
-  const valid = values.filter((value) => typeof value === 'number' && !Number.isNaN(value));
-  return valid.length ? valid.reduce((sum, value) => sum + value, 0) / valid.length : 0;
-};
-
 export function calculateGHQ12Score(answers) {
-  if (!Array.isArray(answers)) return 0;
-  return answers.reduce((sum, value) => sum + Number(value || 0), 0);
-}
-
-export function calculateFlourishingScore(answers) {
-  if (!Array.isArray(answers)) return 0;
-  return answers.reduce((sum, value) => sum + Number(value || 0), 0);
-}
-
-export function calculateDigitalStressScore(answers) {
-  if (!Array.isArray(answers)) return {
-    availabilityStress: 0,
-    approvalAnxiety: 0,
-    fearOfMissingOut: 0,
-    connectionOverload: 0,
-    onlineVigilance: 0,
-  };
-
-  const availabilityStress = average([answers[0], answers[7], answers[15], answers[17]]);
-  const approvalAnxiety = average([answers[2], answers[8], answers[16], answers[19], answers[21], answers[23]]);
-  const fearOfMissingOut = average([answers[4], answers[9], answers[12], answers[20]]);
-  const connectionOverload = average([answers[1], answers[5], answers[10], answers[13], answers[18], answers[22]]);
-  const onlineVigilance = average([answers[3], answers[6], answers[11], answers[14]]);
-
-  return {
-    availabilityStress,
-    approvalAnxiety,
-    fearOfMissingOut,
-    connectionOverload,
-    onlineVigilance,
-  };
-}
-
-export function calculatePSS10Score(answers) {
-  if (!Array.isArray(answers)) return { total: 0, subscales: { helplessness: 0, lackOfSelfEfficacy: 0 } };
-
-  const reverseIndices = [3, 4, 6, 7];
-  const scored = answers.map((value, index) => {
-    const numeric = Number(value || 0);
-    return reverseIndices.includes(index) ? 4 - numeric : numeric;
-  });
-
-  const total = scored.reduce((sum, value) => sum + value, 0);
-  const helplessness = [0, 1, 2, 5, 8, 9].reduce((sum, idx) => sum + scored[idx], 0);
-  const lackOfSelfEfficacy = [3, 4, 6, 7].reduce((sum, idx) => sum + scored[idx], 0);
-
-  return {
-    total,
-    subscales: {
-      helplessness,
-      lackOfSelfEfficacy,
-    },
-  };
-}
-
-export function calculateRSESScore(answers) {
-  if (!Array.isArray(answers)) return 0;
-
-  const reverseIndices = [1, 4, 5, 7, 8];
-  return answers.reduce((sum, value, index) => {
-    const numeric = Number(value || 0);
-    return sum + (reverseIndices.includes(index) ? 3 - numeric : numeric);
+  if (!Array.isArray(answers) || answers.length !== 12) return 0;
+  // Bimodal scoring (0-0-1-1)
+  return answers.reduce((sum, value) => {
+    const score = Number(value || 0);
+    return sum + (score >= 2 ? 1 : 0);
   }, 0);
-}
-
-export function calculateBdi2Score(answers) {
-  if (!Array.isArray(answers)) return 0;
-  return answers.reduce((sum, value) => sum + Number(value || 0), 0);
-}
-
-export function calculateBaiScore(answers) {
-  if (!Array.isArray(answers)) return 0;
-  return answers.reduce((sum, value) => sum + Number(value || 0), 0);
 }
 
 export function interpretGHQ12(score) {
   if (score <= 11) {
     return {
-      title: 'Below threshold',
-      description: 'No significant psychiatric morbidity is indicated by your GHQ-12 score.',
+      title: 'Below Threshold',
+      description: 'Your responses suggest typical levels of well-being.',
       details: [
-        'Your total score is within the expected range for well-being.',
-        'Continue regular self-care and awareness of your mental health.',
-        'This assessment is a screening tool, not a clinical diagnosis.',
+        'You seem to be handling daily challenges reasonably well.',
+        'Continue practicing self-care and monitoring your mood.',
+        'This is a screening result, not a formal diagnosis.',
       ],
     };
   }
   return {
-    title: 'Possible psychiatric morbidity',
-    description: 'Your GHQ-12 score is at or above the threshold for possible psychiatric morbidity.',
+    title: 'Possible Psychiatric Morbidity',
+    description: 'Your responses indicate some emotional distress.',
     details: [
-      'Consider following up with a qualified health professional.',
-      'This result suggests additional assessment may be helpful.',
-      'Use this information as a guide rather than a diagnosis.',
+      'You may be experiencing more stress than usual.',
+      'Consider speaking with a counselor or trusted support person.',
+      'This result is informational and not clinical advice.',
     ],
   };
+}
+
+export function calculateFlourishingScore(answers) {
+  if (!Array.isArray(answers) || answers.length !== 8) return 0;
+  return answers.reduce((sum, value) => sum + Number(value || 0), 0);
 }
 
 export function interpretFlourishing(score) {
-  if (score >= 50) {
+  if (score >= 42) {
     return {
       title: 'High Flourishing',
-      description: 'You are experiencing strong positive functioning and well-being.',
+      description: 'You have a strong sense of purpose and well-being.',
       details: [
-        'You likely feel purposeful and connected.',
-        'Continue to nurture the aspects of life that support your well-being.',
-        'This is an encouraging sign, but not a clinical assessment.',
+        'You likely feel connected and capable in your daily life.',
+        'Continue nurturing your positive relationships and goals.',
+        'This is for self-awareness and not a diagnosis.',
       ],
     };
   }
-  if (score >= 38) {
+  if (score >= 30) {
     return {
-      title: 'Moderate Flourishing',
-      description: 'You are generally doing well but may have room to grow.',
+      title: 'Moderate Well-being',
+      description: 'Your psychological well-being is in a healthy range.',
       details: [
-        'You have positive strengths to build on.',
-        'Consider focusing on relationships, purpose, or optimism.',
-        'Use this insight to support your emotional wellness.',
-      ],
-    };
-  }
-  if (score >= 27) {
-    return {
-      title: 'Low Flourishing',
-      description: 'Some key areas of well-being could use more attention.',
-      details: [
-        'Reflect on your sense of purpose and social support.',
-        'Small, consistent actions may help improve your mood.',
-        'This is a guide, not a diagnosis.',
+        'There are areas of strength and areas for growth.',
+        'Consider which aspects of life you would like to nurture more.',
+        'This is informational and not clinical advice.',
       ],
     };
   }
   return {
-    title: 'Very Low Flourishing',
-    description: 'Your current sense of well-being appears limited in many areas.',
+    title: 'Needs Support',
+    description: 'Your responses suggest lower psychological well-being.',
     details: [
-      'Consider reaching out to trusted supports or a counselor.',
-      'Focus on rest, self-compassion, and gradual steps forward.',
-      'Professional help may be especially valuable at this time.',
+      'You may benefit from exploring new supportive practices.',
+      'Consider reaching out to a mentor or professional for guidance.',
+      'This is for self-reflection and not a diagnosis.',
     ],
   };
 }
 
-export function interpretDigitalStress(scores) {
-  const overallAverage = typeof scores === 'number' ? scores : average(Object.values(scores));
-  let title = 'Digital Stress';
-  let description = 'Your digital stress score provides insight into how online life is affecting you.';
+export function calculateDigitalStressScore(answers) {
+  if (!Array.isArray(answers) || answers.length === 0) return 0;
+  return answers.reduce((sum, value) => sum + Number(value || 0), 0) / answers.length;
+}
 
-  if (overallAverage <= 2) {
-    title = 'Low Digital Stress';
-    description = 'You are experiencing relatively low stress from digital life.';
-  } else if (overallAverage <= 3.5) {
-    title = 'Moderate Digital Stress';
-    description = 'You are noticing some digital stress, and it may help to build healthier boundaries online.';
-  } else {
-    title = 'High Digital Stress';
-    description = 'Digital life may be contributing significantly to your stress.';
+export function interpretDigitalStress(score) {
+  if (score <= 2) {
+    return {
+      title: 'Low Digital Stress',
+      description: 'Online life has a minimal negative impact on you.',
+      details: [
+        'You seem to have healthy boundaries with digital technology.',
+        'Continue being mindful of your screen time and online interactions.',
+        'This result is for general awareness.',
+      ],
+    };
   }
-
+  if (score <= 3.5) {
+    return {
+      title: 'Moderate Digital Stress',
+      description: 'You may be feeling some strain from digital life.',
+      details: [
+        'Building stronger boundaries with technology might help.',
+        'Consider designated offline times to recharge.',
+        'This is for self-awareness and not a diagnosis.',
+      ],
+    };
+  }
   return {
-    title,
-    description,
+    title: 'High Digital Stress',
+    description: 'Digital life is likely contributing significantly to your stress.',
     details: [
-      'Use this result to think about digital habits that support your wellbeing.',
-      'Consider reducing notifications, taking breaks, and setting clear boundaries.',
-      'If digital stress feels persistent, talk with a trusted person or counselor.',
+      'It may be helpful to re-evaluate your relationship with technology.',
+      'Seeking support to manage digital strain could be beneficial.',
+      'This result is informational only.',
     ],
   };
+}
+
+export function calculatePSS10Score(answers) {
+  if (!Array.isArray(answers) || answers.length !== 10) return 0;
+  // Reverse score items: 4, 5, 7, 8 (indices 3, 4, 6, 7)
+  const scored = answers.map((value, index) => {
+    const numeric = Number(value || 0);
+    if ([3, 4, 6, 7].includes(index)) {
+      return 4 - numeric;
+    }
+    return numeric;
+  });
+  return scored.reduce((sum, value) => sum + value, 0);
 }
 
 export function interpretPSS10(score) {
   if (score <= 13) {
     return {
       title: 'Low Stress',
-      description: 'Your perceived stress is below average.',
+      description: 'You are experiencing low levels of perceived stress.',
       details: [
-        'You appear to be managing stress well currently.',
-        'Continue with healthy coping and regular self-care.',
-        'This is informative only and not a diagnosis.',
+        'Your current coping mechanisms seem to be working well.',
+        'Maintain your healthy stress management habits.',
+        'This is a screening result, not a formal diagnosis.',
       ],
     };
   }
   if (score <= 26) {
     return {
       title: 'Moderate Stress',
-      description: 'Your stress level falls within the average range.',
+      description: 'You are experiencing moderate perceived stress.',
       details: [
-        'Many people experience similar levels of stress.',
-        'Consider strategies to ease pressure and increase balance.',
-        'Monitor how your stress evolves over time.',
+        'You might benefit from adding more relaxation or self-care.',
+        'Professional guidance can help manage persistent pressure.',
+        'This is a screening tool, not a clinical evaluation.',
       ],
     };
   }
   return {
     title: 'High Stress',
-    description: 'Your perceived stress is elevated.',
+    description: 'You are experiencing high levels of perceived stress.',
     details: [
-      'It may help to seek additional support or self-care.',
-      'Professional guidance can help manage persistent pressure.',
-      'This is a screening tool, not a clinical evaluation.',
+      'Consider reaching out for support or relaxation techniques.',
+      'A mental health professional can help you develop coping strategies.',
+      'This is informational only and not a diagnosis.',
     ],
   };
+}
+
+export function calculateRSESScore(answers) {
+  if (!Array.isArray(answers) || answers.length !== 10) return 0;
+  // Reverse score items: 2, 5, 6, 8, 9 (indices 1, 4, 5, 7, 8)
+  const scored = answers.map((value, index) => {
+    const numeric = Number(value || 0);
+    if ([1, 4, 5, 7, 8].includes(index)) {
+      return 3 - numeric;
+    }
+    return numeric;
+  });
+  return scored.reduce((sum, value) => sum + value, 0);
 }
 
 export function interpretRSES(score) {
@@ -346,25 +295,21 @@ export function interpretBai(score) {
 export function calculateBFI10Score(answers) {
   if (!Array.isArray(answers) || answers.length !== 10) return {};
 
-  // BFI-10 has 10 items mapping to 5 traits
-  // Item mapping: 1=E, 2=A, 3=C, 4=N, 5=O, 6=E, 7=A, 8=C, 9=N, 10=O
-  // With reverse scoring for items: 1, 3, 6, 9
-
   const scored = answers.map((value, index) => {
     const numeric = Number(value || 0);
-    // Reverse score items 1, 3, 6, 9 (indices 0, 2, 5, 8)
-    if ([0, 2, 5, 8].includes(index)) {
-      return 6 - numeric; // Reverse: 1->5, 2->4, 3->3, 4->2, 5->1
+    // Reverse score items indices 2 (Q3) and 6 (Q7)
+    if ([2, 6].includes(index)) {
+      return 6 - numeric;
     }
     return numeric;
   });
 
-  // Calculate trait scores (average of 2 items each)
-  const openness = (scored[4] + scored[9]) / 2; // Items 5, 10
-  const conscientiousness = (scored[2] + scored[7]) / 2; // Items 3, 8 (reversed + normal)
-  const extraversion = (scored[0] + scored[5]) / 2; // Items 1, 6 (both reversed)
-  const agreeableness = (scored[1] + scored[6]) / 2; // Items 2, 7
-  const neuroticism = (scored[3] + scored[8]) / 2; // Items 4, 9
+  // Calculate trait scores based on mapping in BFI10.jsx
+  const extraversion = scored[0]; // Q1
+  const agreeableness = (scored[1] + scored[3]) / 2; // Q2, Q4
+  const conscientiousness = (scored[2] + scored[7]) / 2; // Q3, Q8
+  const neuroticism = (scored[4] + scored[6] + scored[8]) / 3; // Q5, Q7, Q9
+  const openness = (scored[5] + scored[9]) / 2; // Q6, Q10
 
   return {
     openness,
