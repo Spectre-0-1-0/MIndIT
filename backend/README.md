@@ -73,11 +73,11 @@ The server will run on `http://localhost:3001`
 - `GET /api/auth/verify` - Verify JWT token
 
 ### BFI-10 Submissions
-- `POST /api/bfi10-submissions` - Save new submission
-- `GET /api/bfi10-submissions` - Get all submissions (admin only)
-- `GET /api/bfi10-submissions/:id` - Get individual submission (admin only)
-- `DELETE /api/bfi10-submissions/:id` - Delete submission (admin only)
-- `GET /api/bfi10-submissions/stats` - Get submission statistics (admin only)
+- `POST /api/bfi10/submissions` - Save new submission
+- `GET /api/bfi10/submissions` - Get all submissions (admin only)
+- `GET /api/bfi10/submissions/:id` - Get individual submission (admin only)
+- `DELETE /api/bfi10/submissions/:id` - Delete submission (admin only)
+- `GET /api/bfi10/submissions/stats` - Get submission statistics (admin only)
 
 ### Health Check
 - `GET /api/health` - Server health check

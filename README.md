@@ -199,11 +199,11 @@ npm test
 - `GET /api/auth/verify` - Verify JWT token
 
 ### BFI-10 Endpoints
-- `POST /api/bfi10-submissions` - Save submission
-- `GET /api/bfi10-submissions` - Get submissions (admin)
-- `GET /api/bfi10-submissions/:id` - Get single submission (admin)
-- `DELETE /api/bfi10-submissions/:id` - Delete submission (admin)
-- `GET /api/bfi10-submissions/stats` - Get statistics (admin)
+- `POST /api/bfi10/submissions` - Save submission
+- `GET /api/bfi10/submissions` - Get submissions (admin)
+- `GET /api/bfi10/submissions/:id` - Get single submission (admin)
+- `DELETE /api/bfi10/submissions/:id` - Delete submission (admin)
+- `GET /api/bfi10/submissions/stats` - Get statistics (admin)
 
 ## 🤝 Contributing
 
