@@ -102,7 +102,7 @@ Frontend will run on: http://localhost:5173
 ## 🔐 Admin Access
 
 - **URL**: `/bfi10-admin`
-- **Default Password**: `MUdaanM` (configurable in `.env`)
+- **Default Password**: `` (configurable in `.env`)
 - **Features**:
   - View all submissions
   - Search and filter submissions
