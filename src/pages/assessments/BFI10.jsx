@@ -34,7 +34,7 @@ const traitNames = {
 };
 
 export default function BFI10() {
-  const [step, setStep] = useState('userData'); // 'userData', 'consent', 'assessment', 'submitting', 'completed'
+  const [step, setStep] = useState('userData'); // 'userData', 'consent', 'assessment', 'submitting'
   const [userData, setUserData] = useState({
     name: '',
     rollNumber: '',
@@ -127,7 +127,30 @@ export default function BFI10() {
       }
 
       await response.json();
-      setStep('completed');
+
+      // Navigate to results page with data
+      navigate('/results', {
+        state: {
+          result: {
+            assessmentId: 'bfi10',
+            title: 'BFI-10 Personality Profile',
+            userName: anonymous ? 'Anonymous' : userData.name,
+            anonymous,
+            userInfo: anonymous ? null : {
+              fullName: userData.name,
+              rollNumber: userData.rollNumber,
+              email: userData.email,
+              phone: userData.phone || null,
+              department: userData.department || null,
+              academicYear: userData.academicYear || null,
+            },
+            score: null,
+            oceanScores,
+            interpretation,
+            responses: answers,
+          },
+        },
+      });
     } catch (err) {
       console.error("Submission error:", err);
       setError('Failed to save assessment. Please check your connection.');
@@ -146,26 +169,6 @@ export default function BFI10() {
           <h2 className="text-2xl font-bold text-slate-900">Saving Results</h2>
           <p className="text-slate-500">Your profile is being generated...</p>
         </div>
-      </section>
-    );
-  }
-
-  if (step === 'completed') {
-    return (
-      <section className="min-h-[400px] flex flex-col items-center justify-center space-y-8 rounded-[2rem] bg-white p-10 shadow-lg text-center">
-        <div className="h-20 w-20 rounded-full bg-green-100 flex items-center justify-center text-4xl">✅</div>
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-slate-900">Assessment Submitted Successfully</h1>
-          <p className="text-slate-600 max-w-md mx-auto">
-            Thank you for completing the BFI-10 assessment. Your responses have been securely recorded for administrative review.
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/')}
-          className="rounded-full bg-indigo-600 px-8 py-3 font-bold text-white shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
-        >
-          Return Home
-        </button>
       </section>
     );
   }

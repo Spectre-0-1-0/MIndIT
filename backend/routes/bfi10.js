@@ -1,7 +1,7 @@
 const express = require('express');
-const { body, validationResult, query } = require('express-validator');
-const { db } = require('../config/database');
 const jwt = require('jsonwebtoken');
+const { body, query, validationResult } = require('express-validator');
+const { db } = require('../config/database');
 
 const router = express.Router();
 
@@ -10,13 +10,11 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
 }
 
+// Helper for database queries
 const runQuery = (sql, params = []) => {
   return new Promise((resolve, reject) => {
     db.run(sql, params, function (err) {
-      if (err) {
-        reject(err);
-        return;
-      }
+      if (err) return reject(err);
       resolve(this);
     });
   });
@@ -73,7 +71,7 @@ const validateBFI10Submission = [
   body('interpretation').isObject().withMessage('Interpretation must be an object')
 ];
 
-// POST /api/bfi10-submissions - Save new submission
+// POST /api/bfi10/submissions - Save new submission
 router.post('/submissions', validateBFI10Submission, async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -124,33 +122,14 @@ router.post('/submissions', validateBFI10Submission, async (req, res) => {
   }
 });
 
-// GET /api/bfi10-submissions/stats - Get submission statistics (admin only)
-router.get('/submissions/stats', verifyAdmin, async (req, res) => {
-  try {
-    const totalResult = await getQuery('SELECT COUNT(*) as total FROM bfi10_submissions');
-    const identifiedResult = await getQuery("SELECT COUNT(*) as identified FROM bfi10_submissions WHERE submission_mode = 'identified'");
-    const anonymousResult = await getQuery("SELECT COUNT(*) as anonymous FROM bfi10_submissions WHERE submission_mode = 'anonymous'");
-    const todayResult = await getQuery("SELECT COUNT(*) as today FROM bfi10_submissions WHERE DATE(created_at) = DATE('now')");
-
-    res.json({
-      total: parseInt(totalResult.total, 10) || 0,
-      identified: parseInt(identifiedResult.identified, 10) || 0,
-      anonymous: parseInt(anonymousResult.anonymous, 10) || 0,
-      today: parseInt(todayResult.today, 10) || 0
-    });
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
-  }
-});
+// GET /api/bfi10/submissions - Get all submissions (admin only)
 router.get('/submissions', verifyAdmin, [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-  query('type').optional().isIn(['all', 'identified', 'anonymous']).withMessage('Type must be all, identified, or anonymous'),
-  query('search').optional().isString().withMessage('Search must be a string')
+  query('page').optional().isInt({ min: 1 }).toInt(),
+  query('limit').optional().isInt({ min: 1, max: 1000 }).toInt(),
+  query('type').optional().isIn(['all', 'identified', 'anonymous']),
+  query('search').optional().isString()
 ], async (req, res) => {
   try {
-    // Check validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
@@ -232,8 +211,8 @@ router.get('/submissions', verifyAdmin, [
     res.json({
       submissions,
       pagination: {
-        page: parseInt(page, 10),
-        limit: parseInt(limit, 10),
+        page,
+        limit,
         total,
         pages: Math.ceil(total / limit)
       }
@@ -245,7 +224,32 @@ router.get('/submissions', verifyAdmin, [
   }
 });
 
-// GET /api/bfi10-submissions/:id - Get individual submission (admin only)
+// GET /api/bfi10/submissions/stats - Get submission statistics (admin only)
+router.get('/submissions/stats', verifyAdmin, async (req, res) => {
+  try {
+    const stats = await getQuery(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN submission_mode = 'identified' THEN 1 ELSE 0 END) as identified,
+        SUM(CASE WHEN submission_mode = 'anonymous' THEN 1 ELSE 0 END) as anonymous,
+        SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today
+      FROM bfi10_submissions
+    `);
+
+    res.json({
+      total: parseInt(stats.total, 10) || 0,
+      identified: parseInt(stats.identified, 10) || 0,
+      anonymous: parseInt(stats.anonymous, 10) || 0,
+      today: parseInt(stats.today, 10) || 0
+    });
+
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
+  }
+});
+
+// GET /api/bfi10/submissions/:id - Get individual submission (admin only)
 router.get('/submissions/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -291,7 +295,7 @@ router.get('/submissions/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-// DELETE /api/bfi10-submissions/:id - Delete submission (admin only)
+// DELETE /api/bfi10/submissions/:id - Delete submission (admin only)
 router.delete('/submissions/:id', verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -310,31 +314,6 @@ router.delete('/submissions/:id', verifyAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error deleting submission:', error);
     res.status(500).json({ error: 'Failed to delete submission' });
-  }
-});
-
-// GET /api/bfi10-submissions/stats - Get submission statistics (admin only)
-router.get('/submissions/stats', verifyAdmin, async (req, res) => {
-  try {
-    const stats = await getQuery(`
-      SELECT
-        COUNT(*) as total,
-        SUM(CASE WHEN submission_mode = 'identified' THEN 1 ELSE 0 END) as identified,
-        SUM(CASE WHEN submission_mode = 'anonymous' THEN 1 ELSE 0 END) as anonymous,
-        SUM(CASE WHEN date(created_at) = date('now') THEN 1 ELSE 0 END) as today
-      FROM bfi10_submissions
-    `);
-
-    res.json({
-      total: parseInt(stats.total, 10),
-      identified: parseInt(stats.identified, 10) || 0,
-      anonymous: parseInt(stats.anonymous, 10) || 0,
-      today: parseInt(stats.today, 10) || 0
-    });
-
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 });
 
