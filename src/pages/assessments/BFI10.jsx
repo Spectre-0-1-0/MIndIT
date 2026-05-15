@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { interpretAssessment } from '../../data/scoring';
+import { calculateBFI10Score, interpretBFI10 } from '../../data/scoring';
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const questions = [
-  { prompt: 'I see myself as someone who is reserved.' },
-  { prompt: 'I see myself as someone who is generally trusting.' },
-  { prompt: 'I see myself as someone who tends to be lazy.' },
-  { prompt: 'I see myself as someone who is relaxed, handles stress well.' },
-  { prompt: 'I see myself as someone who has few artistic interests.' },
-  { prompt: 'I see myself as someone who is outgoing, sociable.' },
-  { prompt: 'I see myself as someone who tends to find fault with others.' },
-  { prompt: 'I see myself as someone who does a thorough job.' },
-  { prompt: 'I see myself as someone who gets nervous easily.' },
-  { prompt: 'I see myself as someone who has an active imagination.' },
+  { id: 1, prompt: 'Is outgoing, sociable', trait: 'E', reverse: false },
+  { id: 2, prompt: 'Is considerate and kind to almost everyone', trait: 'A', reverse: false },
+  { id: 3, prompt: 'Tends to be lazy', trait: 'C', reverse: true },
+  { id: 4, prompt: 'Is generally trusting', trait: 'A', reverse: false },
+  { id: 5, prompt: 'Tends to be depressed, blue', trait: 'N', reverse: false },
+  { id: 6, prompt: 'Is original, comes up with new ideas', trait: 'O', reverse: false },
+  { id: 7, prompt: 'Is calm, emotionally stable', trait: 'N', reverse: true },
+  { id: 8, prompt: 'Is thorough, organized', trait: 'C', reverse: false },
+  { id: 9, prompt: 'Is anxious, easily upset', trait: 'N', reverse: false },
+  { id: 10, prompt: 'Has an active imagination', trait: 'O', reverse: false },
 ];
 
 const answerOptions = [
@@ -23,117 +25,28 @@ const answerOptions = [
   { value: 5, label: 'Agree strongly' },
 ];
 
-function WellnessBuddy() {
-  return (
-    <div className="flex flex-col items-center justify-center space-y-4 mb-8">
-      <div className="relative group">
-        <div className="absolute inset-0 bg-indigo-400/20 rounded-full blur-2xl animate-pulse group-hover:bg-indigo-400/30 transition-colors" />
-        <svg className="relative w-28 h-28 drop-shadow-xl" viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="40" fill="#6366f1" fillOpacity="0.1" />
-          <circle cx="50" cy="50" r="30" fill="#6366f1" fillOpacity="0.2">
-            <animate attributeName="r" values="30;33;30" dur="4s" repeatCount="indefinite" />
-          </circle>
-          {/* Animated Eyes */}
-          <g>
-            <circle cx="42" cy="45" r="3" fill="#4f46e5">
-              <animate attributeName="cy" values="45;44;45" dur="3s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="58" cy="45" r="3" fill="#4f46e5">
-              <animate attributeName="cy" values="45;44;45" dur="3s" repeatCount="indefinite" />
-            </circle>
-          </g>
-          {/* Animated Smile */}
-          <path d="M40 60 Q50 72 60 60" stroke="#4f46e5" strokeWidth="3" fill="transparent" strokeLinecap="round">
-            <animate attributeName="d" values="M40 60 Q50 72 60 60;M40 62 Q50 74 60 62;M40 60 Q50 72 60 60" dur="4s" repeatCount="indefinite" />
-          </path>
-        </svg>
-      </div>
-      <div className="text-center">
-        <p className="text-sm font-bold text-indigo-600 tracking-wide uppercase opacity-80">Wellness Buddy</p>
-        <p className="text-xs text-slate-400">Here to support your journey</p>
-      </div>
-    </div>
-  );
-}
-
-function WaveAnimation() {
-  return (
-    <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none z-0 pointer-events-none opacity-30 select-none">
-      <svg className="relative block w-full h-32" viewBox="0 24 150 28" preserveAspectRatio="none" shapeRendering="auto">
-        <defs>
-          <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-        </defs>
-        <g className="parallax">
-          <use href="#gentle-wave" x="48" y="0" fill="rgba(99, 102, 241, 0.4)">
-            <animateTransform attributeName="transform" type="translate" from="-90 0" to="85 0" dur="15s" repeatCount="indefinite" />
-          </use>
-          <use href="#gentle-wave" x="48" y="3" fill="rgba(99, 102, 241, 0.6)">
-            <animateTransform attributeName="transform" type="translate" from="-90 0" to="85 0" dur="10s" repeatCount="indefinite" />
-          </use>
-          <use href="#gentle-wave" x="48" y="5" fill="rgba(99, 102, 241, 0.2)">
-            <animateTransform attributeName="transform" type="translate" from="-90 0" to="85 0" dur="20s" repeatCount="indefinite" />
-          </use>
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function StepIndicator({ currentStep }) {
-  const steps = [
-    { id: 'userData', label: 'Info' },
-    { id: 'consent', label: 'Consent' },
-    { id: 'assessment', label: 'Questions' }
-  ];
-
-  return (
-    <div className="flex items-center justify-center space-x-6 mb-10 select-none">
-      {steps.map((s, i) => {
-        const isActive = currentStep === s.id;
-        const isPast = steps.findIndex(step => step.id === currentStep) > i;
-
-        return (
-          <div key={s.id} className="flex items-center group">
-            <div className={`relative flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all duration-500 ${
-              isActive
-                ? 'bg-indigo-600 text-white ring-8 ring-indigo-100 shadow-lg scale-110'
-                : isPast
-                  ? 'bg-indigo-100 text-indigo-600'
-                  : 'bg-slate-50 text-slate-300'
-            }`}>
-              {isPast ? '✓' : i + 1}
-              {isActive && (
-                <div className="absolute -inset-1 rounded-full border-2 border-indigo-600/20 animate-ping" />
-              )}
-            </div>
-            <span className={`ml-3 hidden md:block text-xs font-bold uppercase tracking-widest transition-colors duration-300 ${
-              isActive ? 'text-indigo-600' : 'text-slate-400'
-            }`}>
-              {s.label}
-            </span>
-            {i < steps.length - 1 && (
-              <div className={`ml-6 h-0.5 w-8 rounded-full transition-all duration-500 ${
-                isPast ? 'bg-indigo-200' : 'bg-slate-100'
-              }`} />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+const traitNames = {
+  O: 'Openness',
+  C: 'Conscientiousness',
+  E: 'Extraversion',
+  A: 'Agreeableness',
+  N: 'Neuroticism',
+};
 
 export default function BFI10() {
-  const [step, setStep] = useState('userData');
+  const [step, setStep] = useState('userData'); // 'userData', 'consent', 'assessment', 'submitting'
   const [userData, setUserData] = useState({
     name: '',
     rollNumber: '',
     email: '',
-    phone: ''
+    phone: '',
+    department: '',
+    academicYear: '',
   });
+  const [anonymous, setAnonymous] = useState(false);
   const [consent, setConsent] = useState(false);
-  const [answers, setAnswers] = useState(Array(10).fill(null));
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState(Array(questions.length).fill(null));
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -148,12 +61,12 @@ export default function BFI10() {
   };
 
   const validateUserData = () => {
+    if (anonymous) return true;
     if (!userData.name.trim() || !userData.rollNumber.trim() || !userData.email.trim()) {
       setError('Please fill in all required fields.');
       return false;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userData.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email)) {
       setError('Please enter a valid email address.');
       return false;
     }
@@ -161,59 +74,85 @@ export default function BFI10() {
   };
 
   const handleProceedWithInfo = () => {
-    if (validateUserData()) {
-      setStep('consent');
-    }
+    if (validateUserData()) setStep('consent');
   };
 
   const handleProceedAnonymous = () => {
-    setUserData({
-      name: 'Anonymous',
-      rollNumber: 'N/A',
-      email: 'anonymous@mcheck.udaan',
-      phone: ''
-    });
+    setAnonymous(true);
     setStep('consent');
   };
 
-  const handleSubmitAssessment = async () => {
+  const handleSubmitAssessment = async (e) => {
+    e.preventDefault();
     if (answers.some(a => a === null)) {
       setError('Please answer all questions.');
       return;
     }
 
-    setIsLoading(true);
     setStep('submitting');
+    setIsLoading(true);
 
     try {
-      const response = await fetch('/api/bfi10/submissions', {
+      const oceanScores = calculateBFI10Score(answers);
+      const interpretation = interpretBFI10(oceanScores);
+
+      const submissionData = {
+        userID: anonymous ? `anon_${Date.now()}` : userData.rollNumber || `user_${Date.now()}`,
+        timestamp: new Date().toISOString(),
+        anonymous,
+        userInfo: anonymous ? null : {
+          fullName: userData.name,
+          rollNumber: userData.rollNumber,
+          email: userData.email,
+          phone: userData.phone || null,
+          department: userData.department || null,
+          academicYear: userData.academicYear || null
+        },
+        consentGiven: consent,
+        responses: answers,
+        oceanScores,
+        interpretation
+      };
+
+      const response = await fetch(`${API_BASE}/api/bfi10/submissions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: userData.rollNumber,
-          userInfo: userData,
-          consentGiven: consent,
-          responses: answers
-        })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submissionData),
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      if (!response.ok) throw new Error(data.message || 'Submission failed');
+      await response.json();
 
+      // Navigate to results page with data
       navigate('/results', {
         state: {
           result: {
             assessmentId: 'bfi10',
             title: 'BFI-10 Personality Profile',
-            oceanScores: data.ocean_scores,
-            interpretation: data.interpretation,
-            userInfo: userData
-          }
-        }
+            userName: anonymous ? 'Anonymous' : userData.name,
+            anonymous,
+            userInfo: anonymous ? null : {
+              fullName: userData.name,
+              rollNumber: userData.rollNumber,
+              email: userData.email,
+              phone: userData.phone || null,
+              department: userData.department || null,
+              academicYear: userData.academicYear || null,
+            },
+            score: null,
+            oceanScores,
+            interpretation,
+            responses: answers,
+          },
+        },
       });
     } catch (err) {
-      console.error('Submission error:', err);
+      console.error("Submission error:", err);
       setError('Failed to save assessment. Please check your connection.');
       setStep('assessment');
     } finally {
@@ -221,230 +160,208 @@ export default function BFI10() {
     }
   };
 
-  const containerClasses = "relative min-h-[640px] flex flex-col justify-between overflow-hidden rounded-[2.5rem] bg-white p-6 shadow-card hover:shadow-cardHover sm:p-12 transition-all duration-700 perspective-1000 transform-gpu";
-  const innerCardClasses = "relative z-10 w-full animate-entrance";
 
   if (step === 'submitting') {
     return (
-      <div className="max-w-4xl mx-auto py-12 px-4">
-        <section className={containerClasses}>
-          <div className="flex flex-col items-center justify-center flex-1 space-y-8 animate-entrance">
-            <div className="relative">
-               <div className="absolute inset-0 bg-indigo-600/10 rounded-full blur-2xl animate-pulse" />
-               <div className="h-20 w-20 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600 shadow-glow" />
-            </div>
-            <div className="text-center space-y-3">
-              <h2 className="text-3xl font-bold text-slate-900">Creating Your Profile</h2>
-              <p className="text-slate-500 font-medium italic">Finding the perfect words for your personality...</p>
-            </div>
+      <section className="min-h-[400px] flex flex-col items-center justify-center space-y-6 rounded-[2rem] bg-white p-6 shadow-lg">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600" />
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold text-slate-900">Saving Results</h2>
+          <p className="text-slate-500">Your profile is being generated...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (step === 'assessment') {
+    const q = questions[currentQuestion];
+    return (
+      <section className="space-y-8 rounded-[2rem] bg-white p-6 shadow-lg sm:p-10">
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <span>Question {currentQuestion + 1} of {questions.length}</span>
+            <span>{Math.round(((currentQuestion + 1) / questions.length) * 100)}%</span>
           </div>
-          <WaveAnimation />
-        </section>
-      </div>
+          <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+            <div className="h-full bg-indigo-600 transition-all duration-500" style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }} />
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 leading-tight">{q.prompt}</h2>
+          <div className="grid gap-3">
+            {answerOptions.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  const newAnswers = [...answers];
+                  newAnswers[currentQuestion] = opt.value;
+                  setAnswers(newAnswers);
+                  if (currentQuestion < questions.length - 1) {
+                    setTimeout(() => setCurrentQuestion(c => c + 1), 200);
+                  }
+                }}
+                className={`group flex items-center justify-between rounded-2xl border-2 p-5 text-left transition-all ${
+                  answers[currentQuestion] === opt.value
+                    ? 'border-indigo-600 bg-indigo-50'
+                    : 'border-slate-100 hover:border-indigo-200 hover:bg-slate-50'
+                }`}
+              >
+                <span className={`font-semibold ${answers[currentQuestion] === opt.value ? 'text-indigo-700' : 'text-slate-600'}`}>
+                  {opt.label}
+                </span>
+                <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                  answers[currentQuestion] === opt.value ? 'border-indigo-600 bg-indigo-600' : 'border-slate-200'
+                }`}>
+                  {answers[currentQuestion] === opt.value && <div className="h-2 w-2 rounded-full bg-white" />}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-4">
+          <button
+            disabled={currentQuestion === 0}
+            onClick={() => setCurrentQuestion(c => c - 1)}
+            className="text-sm font-bold text-slate-400 hover:text-slate-600 disabled:opacity-0 transition-all"
+          >
+            ← Previous Question
+          </button>
+          {currentQuestion === questions.length - 1 && (
+            <button
+              onClick={handleSubmitAssessment}
+              disabled={answers.some(a => a === null)}
+              className="rounded-full bg-indigo-600 px-10 py-4 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 disabled:opacity-50 transition-all"
+            >
+              Complete Assessment
+            </button>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  if (step === 'consent') {
+    return (
+      <section className="space-y-8 rounded-[2rem] bg-white p-6 shadow-lg sm:p-10">
+        <div className="h-16 w-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-3xl">📝</div>
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold text-slate-900">Privacy & Consent</h1>
+          <div className="prose prose-slate text-slate-600">
+            <p>Your data will be used for research and administrative purposes only. We ensure that:</p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Your personal information is stored securely.</li>
+              <li>Responses are kept confidential.</li>
+              <li>You can request data deletion at any time.</li>
+            </ul>
+          </div>
+        </div>
+
+        <label className="flex items-start gap-4 rounded-2xl border-2 border-slate-100 p-6 cursor-pointer hover:bg-slate-50 transition-colors">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className="mt-1 h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+          />
+          <span className="text-sm font-medium text-slate-700 leading-relaxed">
+            I understand and agree to the data collection policy for administrative tracking.
+          </span>
+        </label>
+
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <button onClick={() => setStep('userData')} className="flex-1 rounded-full border-2 border-slate-200 py-4 font-bold text-slate-700 hover:bg-slate-50 transition-all">Back</button>
+          <button
+            onClick={() => setStep('assessment')}
+            disabled={!consent}
+            className="flex-1 rounded-full bg-indigo-600 py-4 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 disabled:opacity-50 transition-all"
+          >
+            I Agree & Start
+          </button>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
-      <StepIndicator currentStep={step} />
+    <section className="space-y-8 rounded-[2rem] bg-white p-6 shadow-lg sm:p-10">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold text-slate-900">BFI-10 Personality Assessment</h1>
+        <p className="text-slate-500 leading-relaxed">A brief, scientifically validated measurement of your Big Five personality traits.</p>
+      </div>
 
-      <section className={containerClasses}>
-        <div className={innerCardClasses} key={step + (step === 'assessment' ? currentQuestion : '')}>
-          {step === 'userData' && (
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">BFI-10 Assessment</h1>
-                <p className="text-lg text-slate-500 leading-relaxed max-w-2xl">A brief, scientifically validated measurement of your personality traits.</p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label htmlFor="full-name" className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-widest">Full Name</label>
-                    <input
-                      id="full-name"
-                      value={userData.name}
-                      onChange={(e) => handleUserDataChange('name', e.target.value)}
-                      placeholder="John Doe"
-                      className="mc-input px-6 py-4 text-base"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="roll-number" className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-widest">Roll Number</label>
-                    <input
-                      id="roll-number"
-                      value={userData.rollNumber}
-                      onChange={(e) => handleUserDataChange('rollNumber', e.target.value)}
-                      placeholder="CS12345"
-                      className="mc-input px-6 py-4 text-base"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-widest">Email Address</label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={userData.email}
-                      onChange={(e) => handleUserDataChange('email', e.target.value)}
-                      placeholder="john@university.edu"
-                      className="mc-input px-6 py-4 text-base"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="phone" className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-widest">Phone (Optional)</label>
-                    <input
-                      id="phone"
-                      value={userData.phone}
-                      onChange={(e) => handleUserDataChange('phone', e.target.value)}
-                      placeholder="+1 234 567 890"
-                      className="mc-input px-6 py-4 text-base"
-                    />
-                  </div>
-                </div>
-                {error && <div className="rounded-2xl bg-red-50 p-5 text-sm font-semibold text-red-600 border border-red-100 animate-shake">{error}</div>}
-              </div>
-            </div>
-          )}
-
-          {step === 'consent' && (
-            <div className="space-y-8">
-              <WellnessBuddy />
-              <div className="space-y-4 text-center md:text-left">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Privacy & Consent</h1>
-                <div className="prose prose-slate text-slate-600 text-base leading-relaxed">
-                  <p>Your data is precious. We use it for research and administrative purposes with the utmost care:</p>
-                  <ul className="list-disc pl-5 space-y-2 mt-4 text-left inline-block">
-                    <li>Secure storage & JWT protection</li>
-                    <li>Strict confidentiality protocols</li>
-                    <li>Right to data deletion at any time</li>
-                  </ul>
-                </div>
-              </div>
-
-              <label className="mt-8 flex items-start gap-5 rounded-3xl border-2 border-slate-100 p-8 cursor-pointer hover:bg-indigo-50/30 hover:border-indigo-100 transition-all mc-ripple bg-slate-50/30">
-                <input
-                  type="checkbox"
-                  id="consent-checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="mt-1 h-6 w-6 rounded-lg border-slate-300 text-indigo-600 focus:ring-indigo-500 transition-all cursor-pointer"
-                />
-                <span className="text-sm md:text-base font-medium text-slate-700 leading-relaxed">
-                  I understand and agree to the data collection policy for administrative tracking.
-                </span>
-              </label>
-            </div>
-          )}
-
-          {step === 'assessment' && (
-            <div className="space-y-10">
-              <div className="space-y-4">
-                <div className="flex justify-between items-end">
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Progress</p>
-                    <p className="text-sm font-bold text-slate-400">Question {currentQuestion + 1} of {questions.length}</p>
-                  </div>
-                  <span className="text-2xl font-black text-indigo-600 opacity-20">{Math.round(((currentQuestion + 1) / questions.length) * 100)}%</span>
-                </div>
-                <div className="mc-progress h-4">
-                  <div className="mc-progress__bar shadow-glow" style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }} />
-                </div>
-              </div>
-
-              <div className="space-y-8">
-                <h2 className="text-2xl md:text-4xl font-bold text-slate-900 leading-[1.2] tracking-tight min-h-[4rem]">{questions[currentQuestion].prompt}</h2>
-                <div className="grid gap-4">
-                  {answerOptions.map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => {
-                        const newAnswers = [...answers];
-                        newAnswers[currentQuestion] = opt.value;
-                        setAnswers(newAnswers);
-                        if (currentQuestion < questions.length - 1) {
-                          setTimeout(() => setCurrentQuestion(c => c + 1), 250);
-                        }
-                      }}
-                      className={`group flex items-center justify-between rounded-[1.5rem] border-2 p-6 text-left transition-all mc-ripple ${
-                        answers[currentQuestion] === opt.value
-                          ? 'border-indigo-600 bg-indigo-50 transform scale-[1.03] shadow-glow z-20'
-                          : 'border-slate-100 hover:border-indigo-200 hover:bg-slate-50 active:scale-95'
-                      }`}
-                    >
-                      <span className={`text-base md:text-lg font-bold transition-colors ${answers[currentQuestion] === opt.value ? 'text-indigo-700' : 'text-slate-600 group-hover:text-slate-900'}`}>
-                        {opt.label}
-                      </span>
-                      <div className={`h-7 w-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                        answers[currentQuestion] === opt.value ? 'border-indigo-600 bg-indigo-600 rotate-0 scale-110' : 'border-slate-200 group-hover:border-indigo-300 rotate-90'
-                      }`}>
-                        {answers[currentQuestion] === opt.value ? (
-                          <div className="h-2.5 w-2.5 rounded-full bg-white shadow-inner" />
-                        ) : (
-                          <div className="h-1 w-1 rounded-full bg-slate-200" />
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-wider">Full Name</label>
+            <input
+              value={userData.name}
+              onChange={(e) => handleUserDataChange('name', e.target.value)}
+              placeholder="John Doe"
+              className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 px-5 py-4 text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-wider">Roll Number</label>
+            <input
+              value={userData.rollNumber}
+              onChange={(e) => handleUserDataChange('rollNumber', e.target.value)}
+              placeholder="CS12345"
+              className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 px-5 py-4 text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-wider">Email Address</label>
+            <input
+              type="email"
+              value={userData.email}
+              onChange={(e) => handleUserDataChange('email', e.target.value)}
+              placeholder="john@university.edu"
+              className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 px-5 py-4 text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-slate-700 ml-1 uppercase tracking-wider">Phone (Optional)</label>
+            <input
+              value={userData.phone}
+              onChange={(e) => handleUserDataChange('phone', e.target.value)}
+              placeholder="+1 234 567 890"
+              className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 px-5 py-4 text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all"
+            />
+          </div>
         </div>
 
-        <div className="relative z-10 mt-12">
-          {step === 'userData' && (
-            <div className="flex flex-col gap-4 pt-4 sm:flex-row">
-              <button
-                onClick={handleProceedAnonymous}
-                className="flex-1 rounded-full border-2 border-slate-200 py-4 px-8 font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all min-h-[56px] mc-ripple text-base"
-              >
-                Take Anonymously
-              </button>
-              <button
-                onClick={handleProceedWithInfo}
-                className="flex-1 mc-button mc-ripple min-h-[56px] text-base px-8 shadow-glow"
-              >
-                Continue to Consent
-              </button>
-            </div>
-          )}
+        {error && <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-600 border border-red-100">{error}</div>}
 
-          {step === 'consent' && (
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <button onClick={() => setStep('userData')} className="flex-1 rounded-full border-2 border-slate-200 py-4 px-8 font-bold text-slate-700 hover:bg-slate-50 transition-all min-h-[56px] text-base">Back</button>
-              <button
-                onClick={() => setStep('assessment')}
-                disabled={!consent}
-                className="flex-1 mc-button mc-ripple disabled:opacity-40 min-h-[56px] text-base shadow-glow"
-              >
-                I Agree & Start
-              </button>
-            </div>
-          )}
-
-          {step === 'assessment' && (
-            <div className="flex items-center justify-between pt-6 border-t border-slate-100">
-              <button
-                disabled={currentQuestion === 0}
-                onClick={() => setCurrentQuestion(c => c - 1)}
-                className="group flex items-center gap-2 text-sm md:text-base font-bold text-slate-400 hover:text-indigo-600 disabled:opacity-0 transition-all px-4 py-2"
-              >
-                <span className="transition-transform group-hover:-translate-x-1">←</span> Previous Question
-              </button>
-              {currentQuestion === questions.length - 1 && (
-                <button
-                  onClick={handleSubmitAssessment}
-                  disabled={answers.some(a => a === null)}
-                  className="mc-button mc-ripple min-h-[56px] px-12 text-base shadow-glow"
-                >
-                  Complete Assessment
-                </button>
-              )}
-            </div>
-          )}
+        <div className="flex flex-col gap-4 pt-4 sm:flex-row">
+          <button
+            onClick={handleProceedAnonymous}
+            className="flex-1 rounded-full border-2 border-slate-200 py-4 font-bold text-slate-700 hover:bg-slate-50 transition-all"
+          >
+            Take Anonymously
+          </button>
+          <button
+            onClick={handleProceedWithInfo}
+            className="flex-1 rounded-full bg-indigo-600 py-4 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
+          >
+            Continue to Consent
+          </button>
         </div>
-        <WaveAnimation />
-      </section>
-    </div>
+        <div className="pt-6 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('bfi10AdminEntry', 'true');
+              navigate('/bfi10-admin', { state: { fromAssessmentStart: true } });
+            }}
+            className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+          >
+            Admin Dashboard Access
+          </button>
+          <p className="text-xs text-slate-400">This admin panel is available only from the BFI-10 assessment start page.</p>
+        </div>
+      </div>
+    </section>
   );
 }
