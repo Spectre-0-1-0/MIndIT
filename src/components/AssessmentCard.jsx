@@ -4,7 +4,7 @@ export default function AssessmentCard({ id, title, description, time, icon }) {
   return (
     <Link
       to={`/assessment/${id}`}
-      className="mc-card group block cursor-pointer overflow-hidden"
+      className="mc-card asmr-hover group block cursor-pointer overflow-hidden"
       role="button"
       tabIndex={0}
     >

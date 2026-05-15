@@ -150,7 +150,7 @@ export default function Home() {
           <div className="flex flex-col gap-3 md:gap-4 sm:flex-row sm:justify-center animate-slide-up animation-delay-600">
             <button 
               onClick={handleStartAssessment}
-              className="w-full md:w-auto mc-button mc-ripple py-3 md:py-0 min-h-[48px]"
+              className="w-full md:w-auto mc-button mc-ripple asmr-hover py-3 md:py-0 min-h-[48px]"
             >
               Start Your Assessment
             </button>

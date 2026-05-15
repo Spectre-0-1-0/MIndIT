@@ -52,7 +52,7 @@ const Logo = ({
         title={title}
         width={logoWidth}
         height={logoHeight}
-        className="logo-image"
+        className="logo-image asmr-hover"
         style={{
           objectFit: 'contain',
           maxWidth: '100%',

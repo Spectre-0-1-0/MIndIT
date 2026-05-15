@@ -106,7 +106,7 @@ const YourDOSTIntegration = () => {
                   key={step.title}
                   onMouseEnter={() => setActiveStep(step.id)}
                   onMouseLeave={() => setActiveStep(null)}
-                  className={`group relative z-10 flex flex-col items-center gap-4 rounded-[12px] border border-emerald-100 bg-white p-6 text-center shadow-sm transition duration-300 ease-in-out hover:scale-105 hover:shadow-md hover:ring-2 hover:ring-emerald-300 ${
+                  className={`group relative z-10 flex flex-col items-center gap-4 rounded-[12px] border border-emerald-100 bg-white p-6 text-center shadow-sm transition duration-300 ease-in-out asmr-hover ${
                     isVisible ? 'animate-fade-in' : 'opacity-0'
                   }`}
                   style={{ animationDelay: `${index * 100}ms` }}
@@ -132,7 +132,7 @@ const YourDOSTIntegration = () => {
           href="https://yourdost.com"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center justify-center rounded-[8px] bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition duration-250 ease-in-out hover:scale-[1.03] hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-700 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 active:scale-[0.98] active:shadow-inner"
+          className="inline-flex items-center justify-center rounded-[8px] bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-200 transition duration-250 ease-in-out asmr-hover focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500 active:scale-[0.98] active:shadow-inner"
         >
           <ExternalLinkIcon className="mr-2 h-4 w-4" />
           Explore YourDOST Support
