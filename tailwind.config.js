@@ -92,6 +92,7 @@ export default {
         ripple: 'ripple 0.8s ease-out both',
         'stagger-fade': 'stagger-fade 0.6s ease-in-out both',
         'enter-modal': 'enter-modal 0.45s ease-in-out both',
+        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
       },
       keyframes: {
         'fade-in': {
@@ -126,6 +127,12 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(28px) scale(0.96)' },
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
+        'shake': {
+          '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+          '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+          '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+          '40%, 60%': { transform: 'translate3d(4px, 0, 0)' },
+        }
       },
       backgroundImage: {
         'brand-radial': 'radial-gradient(circle at top, rgba(99, 102, 241, 0.18), transparent 40%)',
