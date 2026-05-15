@@ -4,7 +4,7 @@ import Logo from './Logo';
 import './Header.css';
 
 const navClass = ({ isActive }) =>
-  isActive ? 'header-link header-link-active' : 'header-link';
+  isActive ? 'header-link asmr-hover header-link-active' : 'header-link asmr-hover';
 
 function MobileMenu({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -16,7 +16,7 @@ function MobileMenu({ isOpen, onClose }) {
           to="/"
           end
           className={({ isActive }) =>
-            `block py-3 px-4 rounded-lg text-base font-medium transition-colors ${
+            `block py-3 px-4 rounded-lg text-base font-medium transition-colors asmr-hover ${
               isActive
                 ? 'bg-indigo-50 text-indigo-600'
                 : 'text-slate-700 hover:bg-slate-50'
@@ -29,7 +29,7 @@ function MobileMenu({ isOpen, onClose }) {
         <NavLink
           to="/udaan"
           className={({ isActive }) =>
-            `block py-3 px-4 rounded-lg text-base font-medium transition-colors ${
+            `block py-3 px-4 rounded-lg text-base font-medium transition-colors asmr-hover ${
               isActive
                 ? 'bg-indigo-50 text-indigo-600'
                 : 'text-slate-700 hover:bg-slate-50'
@@ -42,7 +42,7 @@ function MobileMenu({ isOpen, onClose }) {
         <NavLink
           to="/contact"
           className={({ isActive }) =>
-            `block py-3 px-4 rounded-lg text-base font-medium transition-colors ${
+            `block py-3 px-4 rounded-lg text-base font-medium transition-colors asmr-hover ${
               isActive
                 ? 'bg-indigo-50 text-indigo-600'
                 : 'text-slate-700 hover:bg-slate-50'
@@ -71,7 +71,7 @@ export default function Header() {
       <header className="header fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 z-50">
         <Link
           to="/"
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 asmr-hover"
           onClick={handleMenuClose}
         >
           <Logo
@@ -85,7 +85,7 @@ export default function Header() {
 
         <button
           type="button"
-          className="md:hidden flex items-center justify-center p-2 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700 min-w-[40px] min-h-[40px]"
+          className="md:hidden flex items-center justify-center p-2 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-700 min-w-[40px] min-h-[40px] asmr-hover"
           aria-label="Toggle navigation"
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"

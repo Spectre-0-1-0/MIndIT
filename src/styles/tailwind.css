@@ -315,3 +315,27 @@
     transform: translateY(0) rotateX(0);
   }
 }
+
+/* ASMR-like interactive effects */
+.asmr-hover {
+  @apply transition-all duration-500 ease-soft transform-gpu;
+}
+
+.asmr-hover:hover {
+  @apply scale-[1.02] shadow-glow;
+  filter: brightness(1.02) saturate(1.1);
+}
+
+.asmr-hover:active {
+  @apply scale-[0.98];
+}
+
+/* Global button refinements */
+button, .mc-button, a {
+  @apply transition-all duration-300;
+}
+
+/* Glass effect refinements */
+.mc-glass-panel {
+  @apply backdrop-blur-xl border-white/40 shadow-glow;
+}
